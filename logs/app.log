@@ -1,0 +1,2 @@
+2026-07-14 18:29:29,886 - WARNING - SECRET_KEY not set in environment; generated a temporary secret. Set SECRET_KEY in production.
+2026-07-14 18:29:29,935 - WARNING - SECRET_KEY not set in environment; generated a temporary secret. Set SECRET_KEY in production.

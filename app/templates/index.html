@@ -4,216 +4,189 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CloudCostAI | AI Cloud Cost Platform</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
-    <style>
-      :root{
-        --bg:#F7F7F5; --card:#FFFFFF; --text:#1F1F1F; --muted:#6B6B6B; --border:#E7E5E4; --accent:#D97706; --hover:#F3F4F6;
-        --radius:18px; --shadow: 0 6px 20px rgba(31,31,31,0.06);
-      }
-      html,body{height:100%;background:var(--bg);font-family:Inter, "IBM Plex Sans", system-ui, sans-serif;color:var(--text);}
-      .app-shell{min-height:100vh;display:flex;gap:24px;padding:28px;box-sizing:border-box}
-      .sidebar{width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
-      .brand{font-weight:700;font-size:20px;letter-spacing:0.2px}
-      .nav-link-ghost{color:var(--muted);display:block;padding:10px;border-radius:12px;text-decoration:none}
-      .nav-link-ghost:hover{background:var(--hover);color:var(--text);transform:translateY(-2px);transition:all 200ms}
-
-      .main{flex:1;display:flex;flex-direction:column;gap:20px}
-      .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
-      .top-controls{display:flex;gap:12px;align-items:center}
-
-      .workspace{display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
-      @media (max-width:992px){.workspace{grid-template-columns:1fr}}
-
-      .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
-      .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-      .eyebrow{color:var(--muted);font-size:13px}
-      h1,h2,h3{margin:0}
-
-      /* Form layout preserved: keep IDs and classes intact */
-      form#prediction-form .form-control{border-radius:12px;border:1px solid var(--border);padding:12px}
-      .btn-primary{background:var(--accent);border-color:var(--accent);box-shadow:none;border-radius:14px;padding:12px 20px}
-      .btn-primary:hover{transform:translateY(-2px);opacity:0.98}
-
-      .result-card{background:linear-gradient(180deg,rgba(255,255,255,0.9),#fff);border-radius:14px;padding:18px;border:1px solid var(--border)}
-
-      .history-table{width:100%;border-collapse:collapse}
-      .history-table th,.history-table td{padding:10px;border-bottom:1px solid var(--border);font-size:14px}
-      .history-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px}
-
-      /* Sticky input box behavior: keep form's submit visible */
-      .sticky-bottom{position:sticky;bottom:18px;background:transparent}
-
-      /* Subtle animations */
-      .fade-in{animation:fadeIn 240ms ease both}
-      @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-      /* Thin scrollbar */
-      ::-webkit-scrollbar{height:8px;width:8px}
-      ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#ddd,#ccc);border-radius:8px}
-    </style>
   </head>
   <body>
-    <div class="app-shell container-fluid">
-      <aside class="sidebar fade-in" role="complementary">
-        <div class="brand">CloudCostAI</div>
-        <p class="eyebrow mt-2">AI Cloud Cost Forecasts</p>
-          <nav class="mt-4">
-          <a class="nav-link-ghost" href="{{ url_for('main.index') }}">Home</a>
-          {% if config.SHOW_ADMIN %}
-            <a class="nav-link-ghost" href="{{ url_for('main.admin') }}">Admin Dashboard</a>
-          {% endif %}
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="{{ url_for('main.index') }}">
+          <span class="brand-mark"><i data-lucide="sparkles"></i></span>
+          <span>
+            <strong>CloudCostAI</strong>
+            <small>AI Cloud Cost Forecasts</small>
+          </span>
+        </a>
+        <nav class="topnav" aria-label="Primary navigation">
+          <a href="{{ url_for('main.index') }}">Predictions</a>
+          <a href="{{ url_for('main.admin') }}" {% if not config.SHOW_ADMIN %}hidden{% endif %}>Dashboard</a>
+          <a href="https://github.com/paladuguganeshnaidu/CloudCostAi" target="_blank" rel="noreferrer">GitHub</a>
+          <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme">
+            <i data-lucide="moon"></i>
+          </button>
         </nav>
-        <div class="mt-4">
-          <small class="text-muted">Made with Flask · scikit-learn</small>
-        </div>
-      </aside>
+      </header>
 
-      <main class="main">
-        <header class="topbar">
-          <div>
-            <h1 class="h4 fw-bold">Estimate cloud costs instantly</h1>
-            <div class="eyebrow">Minimal, fast and production-ready predictions</div>
+      <main class="hero-grid">
+        <section class="hero-panel reveal">
+          <div class="eyebrow"><i data-lucide="activity"></i> Claude-inspired AI workspace</div>
+          <h1>Estimate Cloud Costs with AI</h1>
+          <p>Fast, accurate cloud infrastructure cost forecasting powered by your trained machine learning pipeline.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#prediction-form">Start Prediction</a>
+            <a class="btn btn-secondary" href="{{ url_for('main.admin') }}" {% if not config.SHOW_ADMIN %}hidden{% endif %}>View History</a>
           </div>
-          <div class="top-controls">
-            {% if config.SHOW_ADMIN %}
-              <a class="btn btn-outline-secondary" href="{{ url_for('main.admin') }}">Admin</a>
-            {% endif %}
+          <div class="pill-row">
+            <span><i data-lucide="shield"></i> Secure inputs</span>
+            <span><i data-lucide="history"></i> Prediction history</span>
+            <span><i data-lucide="cpu"></i> Live insights</span>
           </div>
-        </header>
-
-        <section class="workspace">
-          <section class="panel fade-in">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                {% for category, message in messages %}
-                  <div class="alert alert-{{ category }} rounded-4">{{ message }}</div>
-                {% endfor %}
-              {% endif %}
-            {% endwith %}
-
-            <div class="panel-head">
-              <div>
-                <p class="eyebrow">Prediction Form</p>
-                <h2 class="h5 fw-semibold">Cost estimation workspace</h2>
-              </div>
-              <div>
-                <button class="btn btn-outline-secondary" type="button" onclick="clearPredictionForm()">Clear Form</button>
-              </div>
-            </div>
-
-            <form id="prediction-form" method="post" action="{{ url_for('main.predict') }}" class="row g-3" novalidate>
-              <div class="col-md-6">
-                <label class="form-label">Service Name</label>
-                <input type="text" class="form-control" name="service_name" value="{{ values.get('service_name','') }}" maxlength="80" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Usage Quantity</label>
-                <input type="number" step="0.01" min="0" class="form-control" name="usage_quantity" value="{{ values.get('usage_quantity','') }}" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Usage Unit</label>
-                <input type="text" class="form-control" name="usage_unit" value="{{ values.get('usage_unit','') }}" maxlength="40" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Region/Zone</label>
-                <input type="text" class="form-control" name="region" value="{{ values.get('region','') }}" maxlength="60" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">CPU Utilization (%)</label>
-                <input type="number" step="0.01" min="0" max="100" class="form-control" name="cpu" value="{{ values.get('cpu','') }}" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Memory Utilization (%)</label>
-                <input type="number" step="0.01" min="0" max="100" class="form-control" name="memory" value="{{ values.get('memory','') }}" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Network Inbound Data</label>
-                <input type="number" step="0.01" min="0" class="form-control" name="network_in" value="{{ values.get('network_in','') }}" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Network Outbound Data</label>
-                <input type="number" step="0.01" min="0" class="form-control" name="network_out" value="{{ values.get('network_out','') }}" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Usage Start Date</label>
-                <input type="date" class="form-control" name="usage_start" value="{{ values.get('usage_start','') }}" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Usage End Date</label>
-                <input type="date" class="form-control" name="usage_end" value="{{ values.get('usage_end','') }}" required>
-              </div>
-              <div class="col-12">
-                <label class="form-label">Cost per Quantity ($)</label>
-                <input type="number" step="0.01" min="0" class="form-control" name="cost_per_quantity" value="{{ values.get('cost_per_quantity','') }}" required>
-              </div>
-
-              <div class="col-12 sticky-bottom d-flex justify-content-end">
-                <button class="btn btn-primary" type="submit" id="predict-button">
-                  Predict Cost
-                  <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
-                </button>
-              </div>
-            </form>
-          </section>
-
-          <aside class="panel fade-in">
-            {% if prediction_result is not none %}
-              <div class="result-card mb-3">
-                <p class="eyebrow mb-1">Predicted Cost</p>
-                <h2 class="fw-bold">₹ {{ "%.2f"|format(prediction_result) }}</h2>
-                <p class="text-muted">Estimated total cost in INR for the supplied cloud workload.</p>
-              </div>
-            {% else %}
-              <div class="result-card mb-3">
-                <p class="eyebrow mb-1">Prediction Ready</p>
-                <h3 class="fw-semibold mb-0">Your result will appear here</h3>
-                <p class="text-muted mb-0">Submit the form to generate an AI-powered cost estimate.</p>
-              </div>
-            {% endif %}
-
-            <div>
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="fw-semibold mb-0">Recent Predictions</h5>
-                <a class="text-decoration-none small" href="{{ url_for('main.admin') }}">View all</a>
-              </div>
-
-              <!-- Preserve JS hook: history-tbody used by app.js -->
-              <div style="max-height:360px;overflow:auto;padding-right:6px">
-                <table class="history-table" aria-live="polite">
-                  <thead>
-                    <tr><th>ID</th><th>When</th><th>Service</th><th>Region</th><th>Cost</th><th></th></tr>
-                  </thead>
-                  <tbody id="history-tbody">
-                    {% if history %}
-                      {% for item in history %}
-                        <tr>
-                          <td>{{ item.id }}</td>
-                          <td>{{ item.timestamp }}</td>
-                          <td>{{ item.service_name }}</td>
-                          <td>{{ item.region }}</td>
-                          <td>₹ {{ "%.2f"|format(item.predicted_cost) }}</td>
-                          <td><button class="btn btn-outline-danger btn-sm delete-btn" data-id="{{ item.id }}">Delete</button></td>
-                        </tr>
-                      {% endfor %}
-                    {% else %}
-                      <tr id="no-predictions-row"><td colspan="6" class="text-center text-muted">No predictions yet.</td></tr>
-                    {% endif %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </aside>
         </section>
 
-        <footer class="text-muted small mt-auto">Built for production-ready cloud cost forecasting with Flask & scikit-learn.</footer>
+        <aside class="status-panel reveal">
+          {% if prediction_result is not none %}
+            <div class="result-card">
+              <div class="eyebrow"><i data-lucide="dollar-sign"></i> Estimated Cost</div>
+              <div class="result-amount">₹ {{ "%.2f"|format(prediction_result) }}</div>
+              <p>Approximate cost for your selected workload.</p>
+              <span class="status-pill success"><i data-lucide="check-circle"></i> Ready</span>
+            </div>
+          {% else %}
+            <div class="result-card">
+              <div class="eyebrow"><i data-lucide="sparkles"></i> Prediction Ready</div>
+              <div class="result-amount">Awaiting input</div>
+              <p>Submit the form to generate a premium cost estimate.</p>
+              <span class="status-pill"><i data-lucide="activity"></i> Live</span>
+            </div>
+          {% endif %}
+
+          <div class="recent-card">
+            <div class="section-title-row">
+              <h2>Recent Predictions</h2>
+              <a href="{{ url_for('main.admin') }}" {% if not config.SHOW_ADMIN %}hidden{% endif %}>See all</a>
+            </div>
+            <div class="table-shell">
+              <table class="history-table" aria-live="polite">
+                <thead>
+                  <tr><th>Service</th><th>Region</th><th>Cost</th><th></th></tr>
+                </thead>
+                <tbody id="history-tbody">
+                  {% if history %}
+                    {% for item in history %}
+                      <tr>
+                        <td>{{ item.service_name }}</td>
+                        <td>{{ item.region }}</td>
+                        <td>₹ {{ "%.2f"|format(item.predicted_cost) }}</td>
+                        <td><button class="row-action delete-btn" data-id="{{ item.id }}" type="button">Delete</button></td>
+                      </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr id="no-predictions-row"><td colspan="4">No predictions yet.</td></tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </aside>
       </main>
+
+      <section class="form-card reveal">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="section-title-row">
+          <div>
+            <div class="eyebrow"><i data-lucide="cpu"></i> Prediction Form</div>
+            <h2>Cost estimation workspace</h2>
+          </div>
+          <button class="btn btn-secondary" type="button" onclick="clearPredictionForm()">Clear Form</button>
+        </div>
+
+        <form id="prediction-form" method="post" action="{{ url_for('main.predict') }}" novalidate>
+          <div class="form-section">
+            <div class="section-heading"><i data-lucide="cloud"></i> Service Information</div>
+            <div class="field-grid">
+              <label>
+                <span>Service Name</span>
+                <input type="text" name="service_name" value="{{ values.get('service_name','') }}" maxlength="80" required>
+              </label>
+              <label>
+                <span>Usage Unit</span>
+                <input type="text" name="usage_unit" value="{{ values.get('usage_unit','') }}" maxlength="40" required>
+              </label>
+              <label>
+                <span>Region / Zone</span>
+                <input type="text" name="region" value="{{ values.get('region','') }}" maxlength="60" required>
+              </label>
+              <label>
+                <span>Usage Quantity</span>
+                <input type="number" step="0.01" min="0" name="usage_quantity" value="{{ values.get('usage_quantity','') }}" required>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-heading"><i data-lucide="cpu"></i> Infrastructure Metrics</div>
+            <div class="field-grid">
+              <label>
+                <span>CPU Utilization (%)</span>
+                <input type="number" step="0.01" min="0" max="100" name="cpu" value="{{ values.get('cpu','') }}" required>
+              </label>
+              <label>
+                <span>Memory Utilization (%)</span>
+                <input type="number" step="0.01" min="0" max="100" name="memory" value="{{ values.get('memory','') }}" required>
+              </label>
+              <label>
+                <span>Network Inbound</span>
+                <input type="number" step="0.01" min="0" name="network_in" value="{{ values.get('network_in','') }}" required>
+              </label>
+              <label>
+                <span>Network Outbound</span>
+                <input type="number" step="0.01" min="0" name="network_out" value="{{ values.get('network_out','') }}" required>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-heading"><i data-lucide="calendar"></i> Usage Timeline</div>
+            <div class="field-grid">
+              <label>
+                <span>Usage Start Date</span>
+                <input type="date" name="usage_start" value="{{ values.get('usage_start','') }}" required>
+              </label>
+              <label>
+                <span>Usage End Date</span>
+                <input type="date" name="usage_end" value="{{ values.get('usage_end','') }}" required>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-heading"><i data-lucide="dollar-sign"></i> Pricing</div>
+            <div class="field-grid single">
+              <label>
+                <span>Cost per Quantity ($)</span>
+                <input type="number" step="0.01" min="0" name="cost_per_quantity" value="{{ values.get('cost_per_quantity','') }}" required>
+              </label>
+            </div>
+          </div>
+
+          <div class="submit-row">
+            <button class="btn btn-primary" type="submit" id="predict-button">
+              <i data-lucide="arrow-right"></i>
+              Predict Cost
+              <span class="spinner d-none" role="status" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+      </section>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-  </body>
-</html>
+    <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>

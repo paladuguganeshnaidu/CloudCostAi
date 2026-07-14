@@ -5,9 +5,27 @@ document.addEventListener('DOMContentLoaded', function () {
       const btn = document.getElementById('predict-button');
       if (btn) {
         btn.setAttribute('disabled', 'disabled');
-        const spinner = btn.querySelector('.spinner-border');
+        const spinner = btn.querySelector('.spinner');
         if (spinner) spinner.classList.remove('d-none');
       }
+    });
+  }
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+
+  const themeToggle = document.getElementById('theme-toggle');
+  const savedTheme = localStorage.getItem('cloudcostai-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+  document.body.setAttribute('data-theme', theme);
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const current = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', current);
+      localStorage.setItem('cloudcostai-theme', current);
+      if (window.lucide) window.lucide.createIcons();
     });
   }
 });
@@ -33,7 +51,6 @@ document.addEventListener('click', async (e) => {
       if (res.ok) {
         const row = target.closest('tr');
         if (row) row.remove();
-        // optional toast
         alert('Prediction deleted');
       } else {
         const data = await res.json();
@@ -76,7 +93,7 @@ function updateHistoryTable(rows) {
       <td>${item.service_name}</td>
       <td>${item.region}</td>
       <td>${formatINR(item.predicted_cost)}</td>
-      <td><button class="btn btn-outline-danger btn-sm delete-btn" data-id="${item.id}">Delete</button></td>
+      <td><button class="row-action delete-btn" data-id="${item.id}">Delete</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -100,7 +117,6 @@ document.getElementById('search-button')?.addEventListener('click', (e) => {
 document.getElementById('export-csv')?.addEventListener('click', async () => {
   const q = document.getElementById('search-input')?.value || '';
   const url = `/download?q=${encodeURIComponent(q)}`;
-  // trigger download
   const a = document.createElement('a');
   a.href = url;
   a.download = 'cloudcostai_predictions.csv';
@@ -116,7 +132,7 @@ function bindChartDrilldown(chart, type) {
     const idx = elements[0].index;
     const label = chart.data.labels[idx];
     let q = '';
-    if (type === 'daily') q = label; // day string
+    if (type === 'daily') q = label;
     if (type === 'service') q = label;
     if (type === 'region') q = label;
     document.getElementById('search-input').value = q;
