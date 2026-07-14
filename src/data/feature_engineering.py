@@ -5,73 +5,67 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 def create_features(df: pd.DataFrame) -> pd.DataFrame:
+    dataframe = df.copy()
 
-    df = df.copy()
+    if "Usage Duration (Hours)" not in dataframe.columns:
+        if {"Usage Start Date", "Usage End Date"}.issubset(dataframe.columns):
+            dataframe["Usage Duration (Hours)"] = (
+                (dataframe["Usage End Date"] - dataframe["Usage Start Date"]).dt.total_seconds() / 3600
+            )
+        else:
+            raise ValueError("Cannot build duration features without Usage Start/End columns.")
 
-    df["Usage Duration (Hours)"] = (
-        (df["Usage End Date"] - df["Usage Start Date"])
-        .dt.total_seconds() / 3600
-    )
+    if "Total Network Traffic" not in dataframe.columns:
+        if {"Network Inbound Data (Bytes)", "Network Outbound Data (Bytes)"}.issubset(dataframe.columns):
+            dataframe["Total Network Traffic"] = (
+                dataframe["Network Inbound Data (Bytes)"] + dataframe["Network Outbound Data (Bytes)"]
+            )
+        else:
+            raise ValueError("Cannot build network traffic features without inbound/outbound columns.")
 
-    df["Total Network Traffic"] = (
-        df["Network Inbound Data (Bytes)"]
-        + df["Network Outbound Data (Bytes)"]
-    )
+    drop_columns = [
+        column
+        for column in ["Resource ID", "Usage Start Date", "Usage End Date", "Rounded Cost ($)", "Unrounded Cost ($)"]
+        if column in dataframe.columns
+    ]
+    dataframe = dataframe.drop(columns=drop_columns, errors="ignore")
 
-    df.drop(
-        columns=[
-            "Resource ID",
-            "Usage Start Date",
-            "Usage End Date",
-            "Rounded Cost ($)",
-            "Unrounded Cost ($)",
-        ],
-        inplace=True,
-    )
+    desired_column_order = [
+        "Service Name",
+        "Usage Quantity",
+        "Usage Unit",
+        "Region/Zone",
+        "CPU Utilization (%)",
+        "Memory Utilization (%)",
+        "Network Inbound Data (Bytes)",
+        "Network Outbound Data (Bytes)",
+        "Usage Duration (Hours)",
+        "Total Network Traffic",
+        "Cost per Quantity ($)",
+        "Total Cost (INR)",
+    ]
 
-    return df
+    existing = [column for column in desired_column_order if column in dataframe.columns]
+    extra_columns = [column for column in dataframe.columns if column not in existing]
+    return dataframe.loc[:, existing + extra_columns]
 
 
 def build_preprocessor(X: pd.DataFrame):
+    categorical_columns = ["Service Name", "Usage Unit", "Region/Zone"]
+    numerical_columns = [column for column in X.columns if column not in categorical_columns]
 
-    categorical_columns = [
-        "Service Name",
-        "Usage Unit",
-        "Region/Zone",
-    ]
-
-    numerical_columns = [
-        column
-        for column in X.columns
-        if column not in categorical_columns
-    ]
-
-    preprocessor = ColumnTransformer(
+    return ColumnTransformer(
         transformers=[
-            (
-                "categorical",
-                OneHotEncoder(handle_unknown="ignore"),
-                categorical_columns,
-            ),
-            (
-                "numerical",
-                StandardScaler(),
-                numerical_columns,
-            ),
+            ("categorical", OneHotEncoder(handle_unknown="ignore"), categorical_columns),
+            ("numerical", StandardScaler(), numerical_columns),
         ]
     )
 
-    return preprocessor
-
 
 def engineer_features(df: pd.DataFrame):
-
-    df = create_features(df)
-
-    X = df.drop(columns=["Total Cost (INR)"])
-
-    y = df["Total Cost (INR)"]
-
+    engineered = create_features(df)
+    X = engineered.drop(columns=["Total Cost (INR)"], errors="ignore")
+    y = engineered["Total Cost (INR)"]
     preprocessor = build_preprocessor(X)
-
-    return X, y, preprocessor
+    feature_names = preprocessor.get_feature_names_out().tolist()
+    return X, y, preprocessor, feature_names

@@ -33,33 +33,25 @@ NUMERIC_COLUMNS = [
 
 def preprocess_dataset(df: pd.DataFrame) -> pd.DataFrame:
     """Validate and preprocess the cloud cost dataset."""
-    missing_columns = [
-        column for column in REQUIRED_COLUMNS if column not in df.columns
-    ]
+    if df is None:
+        raise ValueError("Dataset cannot be None.")
+
+    dataset = df.copy()
+    missing_columns = [column for column in REQUIRED_COLUMNS if column not in dataset.columns]
 
     if missing_columns:
-        raise ValueError(
-            f"Missing required columns: {', '.join(missing_columns)}"
-        )
+        raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
 
-    for column in df.select_dtypes(include=["object"]).columns:
-        df[column] = df[column].astype(str).str.strip()
+    for column in dataset.select_dtypes(include=["object", "string"]).columns:
+        dataset[column] = dataset[column].astype(str).str.strip()
 
     try:
-        df["Usage Start Date"] = pd.to_datetime(
-            df["Usage Start Date"],
-            format="%d-%m-%Y %H:%M",
-        )
-        df["Usage End Date"] = pd.to_datetime(
-            df["Usage End Date"],
-            format="%d-%m-%Y %H:%M",
-        )
+        dataset["Usage Start Date"] = pd.to_datetime(dataset["Usage Start Date"], format="%d-%m-%Y %H:%M")
+        dataset["Usage End Date"] = pd.to_datetime(dataset["Usage End Date"], format="%d-%m-%Y %H:%M")
     except Exception as exc:
-        raise ValueError(
-            f"Invalid date format found in dataset.\n{exc}"
-        ) from exc
+        raise ValueError(f"Invalid date format found in dataset.\n{exc}") from exc
 
     for column in NUMERIC_COLUMNS:
-        df[column] = pd.to_numeric(df[column], errors="raise")
+        dataset[column] = pd.to_numeric(dataset[column], errors="raise")
 
-    return df
+    return dataset

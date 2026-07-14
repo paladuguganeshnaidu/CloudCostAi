@@ -19,14 +19,15 @@
             <h1 class="h3 fw-bold mb-0">Prediction Insights</h1>
           </div>
           <div class="d-flex gap-2">
-            <a class="btn btn-outline-light" href="{{ url_for('index') }}">Back to Home</a>
-            <a class="btn btn-primary" href="{{ url_for('download') }}{% if search %}?q={{ search }}{% endif %}">Download CSV</a>
+            <a class="btn btn-outline-light" href="{{ url_for('main.index') }}">Back to Home</a>
+            <a class="btn btn-primary" href="{{ url_for('main.download') }}{% if search %}?q={{ search }}{% endif %}">Download CSV</a>
           </div>
         </div>
 
-        <form method="get" class="d-flex gap-2 mb-4">
-          <input type="text" class="form-control" name="q" value="{{ search or '' }}" placeholder="Search by service or region">
-          <button class="btn btn-primary" type="submit">Search</button>
+        <form method="get" class="d-flex gap-2 mb-4 flex-wrap">
+          <input id="search-input" type="text" class="form-control" name="q" value="{{ search or '' }}" placeholder="Search by service or region">
+          <button id="search-button" class="btn btn-primary" type="button">Search</button>
+          <button id="export-csv" class="btn btn-outline-light" type="button">Export CSV</button>
         </form>
 
         <div class="row g-3 mb-4">
@@ -86,7 +87,7 @@
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="history-tbody">
               {% for item in history %}
                 <tr>
                   <td>{{ item.id }}</td>
@@ -95,13 +96,11 @@
                   <td>{{ item.region }}</td>
                   <td>₹ {{ '%.2f'|format(item.predicted_cost) }}</td>
                   <td>
-                    <form method="post" action="{{ url_for('delete_prediction', prediction_id=item.id) }}">
-                      <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                    </form>
+                    <button class="btn btn-outline-danger btn-sm delete-btn" data-id="{{ item.id }}">Delete</button>
                   </td>
                 </tr>
               {% else %}
-                <tr><td colspan="6" class="text-center text-muted">No predictions available.</td></tr>
+                <tr id="no-predictions-row"><td colspan="6" class="text-center text-muted">No predictions available.</td></tr>
               {% endfor %}
             </tbody>
           </table>
@@ -111,21 +110,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script>
       const dailyData = {{ stats.predictions_per_day | tojson }};
       const serviceData = {{ stats.top_services | tojson }};
       const regionData = {{ stats.top_regions | tojson }};
 
-      new Chart(document.getElementById('dailyChart'), {
+      window.dailyChart = new Chart(document.getElementById('dailyChart'), {
         type: 'bar',
         data: {
           labels: dailyData.labels,
-          datasets: [{ label: 'Predictions', data: dailyData.values, backgroundColor: '#6c63ff' }]
+          datasets: [{ label: 'Predictions', data: dailyData.values, backgroundColor: ['#6c63ff', '#49c5b6', '#7c4dff', '#36cfc9'] }]
         },
         options: { responsive: true, plugins: { legend: { display: false } } }
       });
 
-      new Chart(document.getElementById('serviceChart'), {
+      window.serviceChart = new Chart(document.getElementById('serviceChart'), {
         type: 'doughnut',
         data: {
           labels: serviceData.labels,
@@ -134,7 +134,7 @@
         options: { responsive: true }
       });
 
-      new Chart(document.getElementById('regionChart'), {
+      window.regionChart = new Chart(document.getElementById('regionChart'), {
         type: 'pie',
         data: {
           labels: regionData.labels,
@@ -142,6 +142,33 @@
         },
         options: { responsive: true }
       });
+
+      async function refreshCharts() {
+        try {
+          const res = await fetch('/api/stats');
+          if (!res.ok) return;
+          const stats = await res.json();
+          if (window.dailyChart && stats.predictions_per_day) {
+            window.dailyChart.data.labels = stats.predictions_per_day.labels;
+            window.dailyChart.data.datasets[0].data = stats.predictions_per_day.values;
+            window.dailyChart.update();
+          }
+          if (window.serviceChart && stats.top_services) {
+            window.serviceChart.data.labels = stats.top_services.labels;
+            window.serviceChart.data.datasets[0].data = stats.top_services.values;
+            window.serviceChart.update();
+          }
+          if (window.regionChart && stats.top_regions) {
+            window.regionChart.data.labels = stats.top_regions.labels;
+            window.regionChart.data.datasets[0].data = stats.top_regions.values;
+            window.regionChart.update();
+          }
+        } catch (e) {
+          // silent
+        }
+      }
+
+      setInterval(refreshCharts, 30_000);
     </script>
   </body>
 </html>

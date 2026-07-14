@@ -94,7 +94,7 @@ gunicorn "app.app:app" --worker-class gevent --workers 2 --threads 4 --timeout 1
 The project uses:
 
 ```text
-python-3.13.0
+python-3.13.5
 ```
 
 from `runtime.txt`.
@@ -105,6 +105,15 @@ Render should provide:
 
 - `SECRET_KEY` — set a secure random string
 - `DATABASE_PATH` — optional, default is `cloudcostai.db`
+
+You can create a local `.env` file from `.env.example` for development:
+
+```text
+cp .env.example .env
+# then edit .env and set SECRET_KEY
+```
+
+The app reads environment variables at startup. Do NOT commit a production `SECRET_KEY` to version control.
 
 ### Render YAML
 
@@ -185,3 +194,19 @@ README.md
 ## License
 
 This project is licensed under the MIT License.
+
+## GitHub Readiness
+
+- CI workflow: `.github/workflows/ci.yml` runs tests on push and PRs to `main`.
+- Line endings are normalized with `.gitattributes`.
+- Ensure `SECRET_KEY` is set in your Render or GitHub Actions secrets — do not commit secrets.
+- Use `.env.example` as a template for local development.
+- Before opening a PR, run:
+
+```bash
+python -m pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+python -m pytest -q
+```
+
+If you want me to also create a LICENSE or GitHub issue/PR templates, say so and I will add them.

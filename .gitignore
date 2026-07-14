@@ -1,9 +1,48 @@
 __pycache__/
 *.py[cod]
-*.pkl
-*.ipynb_checkpoints/
 .venv/
 .env
 cloudcostai.db
 .DS_Store
 node_modules/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Pytest
+.pytest_cache/
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# dotenv
+.env
+
+# Database
+cloudcostai.db
+
+# OS files
+.DS_Store
+
+# Node
+node_modules/
+
+# Note: model artifacts in `models/` are tracked intentionally for this project.

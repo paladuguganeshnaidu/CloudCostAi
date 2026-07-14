@@ -5,12 +5,10 @@ services:
     plan: free
     region: oregon
     branch: main
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "python -m pip install --upgrade pip setuptools wheel && pip install -r requirements.txt"
     startCommand: "gunicorn \"app.app:app\" --worker-class gevent --workers 2 --threads 4 --timeout 120"
     envVars:
       - key: FLASK_ENV
         value: production
-      - key: SECRET_KEY
-        value: "replace-with-secret"
       - key: DATABASE_PATH
         value: "cloudcostai.db"

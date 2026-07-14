@@ -54,9 +54,31 @@ body {
   color: #8fb7ff;
 }
 
+.hero-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 2fr 1fr;
+}
+
+.floating-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #dce7ff;
+  font-size: 0.875rem;
+}
+
 .result-card {
   background: linear-gradient(120deg, rgba(108, 99, 255, 0.75), rgba(73, 197, 182, 0.45));
   border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.result-card:hover {
+  transform: translateY(-2px);
 }
 
 .history-list {
@@ -95,7 +117,21 @@ body {
   border: none;
 }
 
+.btn-primary:hover {
+  box-shadow: 0 12px 25px rgba(108, 99, 255, 0.35);
+}
+
 .table-dark {
   --bs-table-bg: rgba(255,255,255,0.04);
   --bs-table-border-color: rgba(255,255,255,0.08);
+}
+
+.spinner-border {
+  border-width: 0.14em;
+}
+
+@media (max-width: 992px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
 }
