@@ -1,4 +1,9 @@
-from flask import Blueprint, Response, flash, redirect, render_template, request, url_for
+import os
+import hmac
+from functools import wraps
+from base64 import b64decode
+
+from flask import Blueprint, Response, flash, redirect, render_template, request, url_for, current_app
 
 from app.services import (
     delete_prediction,
@@ -10,6 +15,37 @@ from app.services import (
 )
 
 main_bp = Blueprint("main", __name__)
+
+
+def _check_auth_header(auth_header: str) -> bool:
+    try:
+        if not auth_header.lower().startswith("basic "):
+            return False
+        payload = b64decode(auth_header.split(" ", 1)[1]).decode("utf-8")
+        username, password = payload.split(":", 1)
+        expected_user = os.environ.get("ADMIN_USER")
+        expected_pass = os.environ.get("ADMIN_PASS")
+        if not expected_user or not expected_pass:
+            return False
+        return hmac.compare_digest(username, expected_user) and hmac.compare_digest(password, expected_pass)
+    except Exception:
+        return False
+
+
+def require_basic_auth(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # If admin not enabled, deny
+        if not current_app.config.get("SHOW_ADMIN"):
+            return Response("Not Found", status=404)
+        auth = request.headers.get("Authorization", "")
+        if _check_auth_header(auth):
+            return func(*args, **kwargs)
+        # Request auth
+        resp = Response("Unauthorized", status=401)
+        resp.headers["WWW-Authenticate"] = 'Basic realm="CloudCostAI Admin"'
+        return resp
+    return wrapper
 
 
 @main_bp.route("/")
@@ -64,6 +100,7 @@ def history():
 
 
 @main_bp.route("/admin")
+@require_basic_auth
 def admin():
     search = request.args.get("q", "", type=str)
     stats = get_dashboard_stats(search=search)
@@ -72,6 +109,7 @@ def admin():
 
 
 @main_bp.route("/admin/delete/<int:prediction_id>", methods=["POST"])
+@require_basic_auth
 def delete_prediction_route(prediction_id: int):
     delete_prediction(prediction_id)
     flash("Prediction deleted successfully.", "success")
@@ -79,6 +117,7 @@ def delete_prediction_route(prediction_id: int):
 
 
 @main_bp.route("/api/delete/<int:prediction_id>", methods=["DELETE"])
+@require_basic_auth
 def api_delete_prediction(prediction_id: int):
     try:
         delete_prediction(prediction_id)
@@ -88,6 +127,7 @@ def api_delete_prediction(prediction_id: int):
 
 
 @main_bp.route("/download")
+@require_basic_auth
 def download():
     search = request.args.get("q", "", type=str)
     rows = get_prediction_history(search=search)
@@ -98,6 +138,7 @@ def download():
 
 
 @main_bp.route("/api/stats")
+@require_basic_auth
 def api_stats():
     search = request.args.get("q", "", type=str)
     stats = get_dashboard_stats(search=search)

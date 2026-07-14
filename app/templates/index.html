@@ -5,41 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CloudCostAI | AI Cloud Cost Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+      :root{
+        --bg:#F7F7F5; --card:#FFFFFF; --text:#1F1F1F; --muted:#6B6B6B; --border:#E7E5E4; --accent:#D97706; --hover:#F3F4F6;
+        --radius:18px; --shadow: 0 6px 20px rgba(31,31,31,0.06);
+      }
+      html,body{height:100%;background:var(--bg);font-family:Inter, "IBM Plex Sans", system-ui, sans-serif;color:var(--text);}
+      .app-shell{min-height:100vh;display:flex;gap:24px;padding:28px;box-sizing:border-box}
+      .sidebar{width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+      .brand{font-weight:700;font-size:20px;letter-spacing:0.2px}
+      .nav-link-ghost{color:var(--muted);display:block;padding:10px;border-radius:12px;text-decoration:none}
+      .nav-link-ghost:hover{background:var(--hover);color:var(--text);transform:translateY(-2px);transition:all 200ms}
+
+      .main{flex:1;display:flex;flex-direction:column;gap:20px}
+      .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
+      .top-controls{display:flex;gap:12px;align-items:center}
+
+      .workspace{display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start}
+      @media (max-width:992px){.workspace{grid-template-columns:1fr}}
+
+      .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+      .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+      .eyebrow{color:var(--muted);font-size:13px}
+      h1,h2,h3{margin:0}
+
+      /* Form layout preserved: keep IDs and classes intact */
+      form#prediction-form .form-control{border-radius:12px;border:1px solid var(--border);padding:12px}
+      .btn-primary{background:var(--accent);border-color:var(--accent);box-shadow:none;border-radius:14px;padding:12px 20px}
+      .btn-primary:hover{transform:translateY(-2px);opacity:0.98}
+
+      .result-card{background:linear-gradient(180deg,rgba(255,255,255,0.9),#fff);border-radius:14px;padding:18px;border:1px solid var(--border)}
+
+      .history-table{width:100%;border-collapse:collapse}
+      .history-table th,.history-table td{padding:10px;border-bottom:1px solid var(--border);font-size:14px}
+      .history-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px}
+
+      /* Sticky input box behavior: keep form's submit visible */
+      .sticky-bottom{position:sticky;bottom:18px;background:transparent}
+
+      /* Subtle animations */
+      .fade-in{animation:fadeIn 240ms ease both}
+      @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+      /* Thin scrollbar */
+      ::-webkit-scrollbar{height:8px;width:8px}
+      ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#ddd,#ccc);border-radius:8px}
+    </style>
   </head>
   <body>
-    <div class="background-glow glow-one"></div>
-    <div class="background-glow glow-two"></div>
+    <div class="app-shell container-fluid">
+      <aside class="sidebar fade-in" role="complementary">
+        <div class="brand">CloudCostAI</div>
+        <p class="eyebrow mt-2">AI Cloud Cost Forecasts</p>
+          <nav class="mt-4">
+          <a class="nav-link-ghost" href="{{ url_for('main.index') }}">Home</a>
+          {% if config.SHOW_ADMIN %}
+            <a class="nav-link-ghost" href="{{ url_for('main.admin') }}">Admin Dashboard</a>
+          {% endif %}
+        </nav>
+        <div class="mt-4">
+          <small class="text-muted">Made with Flask · scikit-learn</small>
+        </div>
+      </aside>
 
-    <nav class="navbar navbar-expand-lg navbar-dark container py-3">
-      <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">CloudCostAI</a>
-      <div class="ms-auto d-flex gap-2">
-        <a class="btn btn-outline-light btn-sm" href="{{ url_for('main.admin') }}">Admin Dashboard</a>
-      </div>
-    </nav>
-
-    <main class="container py-4 py-md-5">
-      <section class="hero-grid mb-4">
-        <div class="glass-card p-4 p-md-5">
-          <p class="eyebrow mb-2">AI-powered cloud finance</p>
-          <h1 class="display-5 fw-bold mb-3">Turn cloud usage into trusted cost forecasts.</h1>
-          <p class="text-muted mb-4">CloudCostAI combines a production-grade Flask experience with your trained linear regression model to deliver fast, explainable cost predictions for modern cloud workloads.</p>
-          <div class="d-flex flex-wrap gap-2">
-            <span class="floating-pill">Secure inputs</span>
-            <span class="floating-pill">SQLite history</span>
-            <span class="floating-pill">Responsive UI</span>
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1 class="h4 fw-bold">Estimate cloud costs instantly</h1>
+            <div class="eyebrow">Minimal, fast and production-ready predictions</div>
           </div>
-        </div>
-        <div class="glass-card p-4 p-md-5">
-          <p class="eyebrow mb-2">Live prediction</p>
-          <h2 class="h4 fw-semibold">Ready to estimate your next workload?</h2>
-          <p class="text-muted mb-0">Use the form to produce a prediction, review recent history, and open the admin dashboard for deeper insights.</p>
-        </div>
-      </section>
+          <div class="top-controls">
+            {% if config.SHOW_ADMIN %}
+              <a class="btn btn-outline-secondary" href="{{ url_for('main.admin') }}">Admin</a>
+            {% endif %}
+          </div>
+        </header>
 
-      <div class="row g-4 align-items-stretch">
-        <div class="col-lg-7">
-          <div class="glass-card p-4 p-md-5">
+        <section class="workspace">
+          <section class="panel fade-in">
             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                 {% for category, message in messages %}
@@ -48,13 +95,13 @@
               {% endif %}
             {% endwith %}
 
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div class="panel-head">
               <div>
-                <p class="eyebrow mb-2">Prediction Form</p>
-                <h3 class="h4 fw-semibold mb-0">Cost estimation workspace</h3>
+                <p class="eyebrow">Prediction Form</p>
+                <h2 class="h5 fw-semibold">Cost estimation workspace</h2>
               </div>
-              <div class="d-flex gap-2">
-                <button class="btn btn-outline-light btn-sm" type="button" onclick="clearPredictionForm()">Clear Form</button>
+              <div>
+                <button class="btn btn-outline-secondary" type="button" onclick="clearPredictionForm()">Clear Form</button>
               </div>
             </div>
 
@@ -103,64 +150,68 @@
                 <label class="form-label">Cost per Quantity ($)</label>
                 <input type="number" step="0.01" min="0" class="form-control" name="cost_per_quantity" value="{{ values.get('cost_per_quantity','') }}" required>
               </div>
-              <div class="col-12 d-flex gap-2 flex-wrap">
-                <button class="btn btn-primary px-4 py-2" type="submit" id="predict-button">
+
+              <div class="col-12 sticky-bottom d-flex justify-content-end">
+                <button class="btn btn-primary" type="submit" id="predict-button">
                   Predict Cost
                   <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </section>
 
-        <div class="col-lg-5">
-          <div class="glass-card p-4 p-md-5 h-100">
+          <aside class="panel fade-in">
             {% if prediction_result is not none %}
-              <div class="result-card p-4 rounded-4 mb-4">
-                <p class="eyebrow mb-2">Predicted Cost</p>
-                <h2 class="display-5 fw-bold mb-0">₹ {{ "%.2f"|format(prediction_result) }}</h2>
-                <p class="text-muted mt-3 mb-0">Estimated total cost in INR for the supplied cloud workload.</p>
+              <div class="result-card mb-3">
+                <p class="eyebrow mb-1">Predicted Cost</p>
+                <h2 class="fw-bold">₹ {{ "%.2f"|format(prediction_result) }}</h2>
+                <p class="text-muted">Estimated total cost in INR for the supplied cloud workload.</p>
               </div>
             {% else %}
-              <div class="result-card p-4 rounded-4 mb-4">
-                <p class="eyebrow mb-2">Prediction Ready</p>
-                <h3 class="fw-semibold mb-2">Your result will appear here</h3>
+              <div class="result-card mb-3">
+                <p class="eyebrow mb-1">Prediction Ready</p>
+                <h3 class="fw-semibold mb-0">Your result will appear here</h3>
                 <p class="text-muted mb-0">Submit the form to generate an AI-powered cost estimate.</p>
               </div>
             {% endif %}
 
-            <div class="mt-4">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
                 <h5 class="fw-semibold mb-0">Recent Predictions</h5>
                 <a class="text-decoration-none small" href="{{ url_for('main.admin') }}">View all</a>
               </div>
-              <div class="history-list">
-                {% if history %}
-                  {% for item in history %}
-                    <div class="history-item">
-                      <div>
-                        <strong>{{ item.service_name }}</strong>
-                        <div class="text-muted small">{{ item.region }}</div>
-                      </div>
-                      <div class="text-end">
-                        <strong>₹ {{ "%.2f"|format(item.predicted_cost) }}</strong>
-                        <div class="text-muted small">{{ item.timestamp }}</div>
-                      </div>
-                    </div>
-                  {% endfor %}
-                {% else %}
-                  <p class="text-muted mb-0">No predictions yet.</p>
-                {% endif %}
+
+              <!-- Preserve JS hook: history-tbody used by app.js -->
+              <div style="max-height:360px;overflow:auto;padding-right:6px">
+                <table class="history-table" aria-live="polite">
+                  <thead>
+                    <tr><th>ID</th><th>When</th><th>Service</th><th>Region</th><th>Cost</th><th></th></tr>
+                  </thead>
+                  <tbody id="history-tbody">
+                    {% if history %}
+                      {% for item in history %}
+                        <tr>
+                          <td>{{ item.id }}</td>
+                          <td>{{ item.timestamp }}</td>
+                          <td>{{ item.service_name }}</td>
+                          <td>{{ item.region }}</td>
+                          <td>₹ {{ "%.2f"|format(item.predicted_cost) }}</td>
+                          <td><button class="btn btn-outline-danger btn-sm delete-btn" data-id="{{ item.id }}">Delete</button></td>
+                        </tr>
+                      {% endfor %}
+                    {% else %}
+                      <tr id="no-predictions-row"><td colspan="6" class="text-center text-muted">No predictions yet.</td></tr>
+                    {% endif %}
+                  </tbody>
+                </table>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </main>
+          </aside>
+        </section>
 
-    <footer class="container py-4 text-center text-muted small">
-      Built for production-ready cloud cost forecasting with Flask, scikit-learn, and Bootstrap.
-    </footer>
+        <footer class="text-muted small mt-auto">Built for production-ready cloud cost forecasting with Flask & scikit-learn.</footer>
+      </main>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>

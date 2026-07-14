@@ -28,6 +28,7 @@ def create_app() -> Flask:
     app.config.update(
         SECRET_KEY=configured_secret,
         DATABASE_PATH=os.environ.get("DATABASE_PATH", str(PROJECT_ROOT / "cloudcostai.db")),
+        SHOW_ADMIN=os.environ.get("SHOW_ADMIN", "false").lower() in ("1", "true", "yes"),
         MAX_CONTENT_LENGTH=1_000_000,
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
