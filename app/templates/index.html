@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CloudCostAI | Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
+
+    <div class="container py-5">
+      <div class="row g-4 align-items-stretch">
+        <div class="col-lg-7">
+          <div class="glass-card p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <p class="eyebrow mb-2">AI Powered Cloud Cost Prediction</p>
+                <h1 class="display-6 fw-bold mb-0">CloudCostAI</h1>
+              </div>
+              <a class="btn btn-outline-light btn-sm" href="{{ url_for('admin') }}">Open Admin</a>
+            </div>
+
+            <p class="text-muted mb-4">
+              Forecast cloud usage costs with a professional, production-ready inference experience.
+            </p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} rounded-4">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form method="post" action="{{ url_for('predict') }}" class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Service Name</label>
+                <input type="text" class="form-control" name="service_name" value="{{ values.get('service_name','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Usage Quantity</label>
+                <input type="number" step="0.01" class="form-control" name="usage_quantity" value="{{ values.get('usage_quantity','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Usage Unit</label>
+                <input type="text" class="form-control" name="usage_unit" value="{{ values.get('usage_unit','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Region/Zone</label>
+                <input type="text" class="form-control" name="region" value="{{ values.get('region','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">CPU Utilization (%)</label>
+                <input type="number" step="0.01" class="form-control" name="cpu" value="{{ values.get('cpu','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Memory Utilization (%)</label>
+                <input type="number" step="0.01" class="form-control" name="memory" value="{{ values.get('memory','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Network Inbound Data</label>
+                <input type="number" step="0.01" class="form-control" name="network_in" value="{{ values.get('network_in','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Network Outbound Data</label>
+                <input type="number" step="0.01" class="form-control" name="network_out" value="{{ values.get('network_out','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Usage Start Date</label>
+                <input type="date" class="form-control" name="usage_start" value="{{ values.get('usage_start','') }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Usage End Date</label>
+                <input type="date" class="form-control" name="usage_end" value="{{ values.get('usage_end','') }}" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Cost per Quantity ($)</label>
+                <input type="number" step="0.01" class="form-control" name="cost_per_quantity" value="{{ values.get('cost_per_quantity','') }}" required>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary px-4 py-2" type="submit">Predict Cost</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="glass-card p-4 p-md-5 h-100">
+            {% if prediction_result is not none %}
+              <div class="result-card p-4 rounded-4 mb-4">
+                <p class="eyebrow mb-2">Predicted Cost</p>
+                <h2 class="display-5 fw-bold mb-0">₹ {{ "%.2f"|format(prediction_result) }}</h2>
+                <p class="text-muted mt-3 mb-0">Estimated total cost in INR for the supplied cloud workload.</p>
+              </div>
+            {% else %}
+              <div class="result-card p-4 rounded-4 mb-4">
+                <p class="eyebrow mb-2">Prediction Ready</p>
+                <h3 class="fw-semibold mb-2">Your result will appear here</h3>
+                <p class="text-muted mb-0">Submit the form to generate an AI-powered cost estimate.</p>
+              </div>
+            {% endif %}
+
+            <div class="mt-4">
+              <h5 class="fw-semibold mb-3">Recent Predictions</h5>
+              <div class="history-list">
+                {% if history %}
+                  {% for item in history %}
+                    <div class="history-item">
+                      <div>
+                        <strong>{{ item.service_name }}</strong>
+                        <div class="text-muted small">{{ item.region }}</div>
+                      </div>
+                      <div class="text-end">
+                        <strong>₹ {{ "%.2f"|format(item.predicted_cost) }}</strong>
+                        <div class="text-muted small">{{ item.timestamp }}</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <p class="text-muted mb-0">No predictions yet.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

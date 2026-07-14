@@ -1,0 +1,101 @@
+:root {
+  color-scheme: dark;
+  --bg: #050816;
+  --card: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.16);
+  --text: #f4f7ff;
+  --muted: #94a3b8;
+  --accent: #6c63ff;
+  --accent-2: #49c5b6;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg), #111a34);
+  color: var(--text);
+  font-family: Inter, 'Segoe UI', sans-serif;
+}
+
+.background-glow {
+  position: fixed;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  z-index: -1;
+}
+
+.glow-one {
+  top: -8rem;
+  left: -6rem;
+  background: var(--accent);
+}
+
+.glow-two {
+  right: -6rem;
+  bottom: -8rem;
+  background: var(--accent-2);
+}
+
+.glass-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8fb7ff;
+}
+
+.result-card {
+  background: linear-gradient(120deg, rgba(108, 99, 255, 0.75), rgba(73, 197, 182, 0.45));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.form-control {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.form-control::placeholder {
+  color: #9aa8bf;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #8b7dff);
+  border: none;
+}
+
+.table-dark {
+  --bs-table-bg: rgba(255,255,255,0.04);
+  --bs-table-border-color: rgba(255,255,255,0.08);
+}

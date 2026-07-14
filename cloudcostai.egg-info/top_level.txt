@@ -1,0 +1,10 @@
+app
+config
+data
+docs
+logs
+models
+outputs
+reports
+src
+tests
