@@ -1,4 +1,5 @@
 import csv
+import os
 import sqlite3
 import sys
 from datetime import datetime
@@ -24,8 +25,10 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.model.predict import predict_cost
 
 app = Flask(__name__)
-app.secret_key = "cloudcostai-secret-key"
-app.config["DATABASE"] = PROJECT_ROOT / "cloudcostai.db"
+app.secret_key = os.environ.get("SECRET_KEY", "cloudcostai-secret-key")
+app.config["DATABASE"] = Path(
+    os.environ.get("DATABASE_PATH", str(PROJECT_ROOT / "cloudcostai.db"))
+)
 
 
 def get_db_connection() -> sqlite3.Connection:
@@ -181,7 +184,7 @@ def get_prediction_history(limit: int | None = None, search: str | None = None):
         params.append(limit)
     rows = conn.execute(query, params).fetchall()
     conn.close()
-    return rows
+    return [dict(row) for row in rows]
 
 
 def get_dashboard_stats(search: str | None = None) -> dict:
@@ -334,4 +337,7 @@ def download():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+    )
