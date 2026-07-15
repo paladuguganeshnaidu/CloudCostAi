@@ -63,8 +63,8 @@
                   <span class="breakdown-value">₹ {{ "%.4f"|format(cost_breakdown.baseline_cost) }}</span>
                 </div>
                 <div class="breakdown-row">
-                  <span class="breakdown-label">ML Model Output</span>
-                  <span class="breakdown-value">₹ {{ "%.4f"|format(cost_breakdown.raw_model_cost) }}</span>
+                  <span class="breakdown-label">ML Coefficient</span>
+                  <span class="breakdown-value breakdown-mult">{{ "%.4f"|format(cost_breakdown.ml_coefficient) }}×</span>
                 </div>
                 <div class="breakdown-row breakdown-divider">
                   <span class="breakdown-label">Regional Multiplier</span>
@@ -198,11 +198,11 @@
                 </div>
               </label>
               <label>
-                <span>Network Inbound (Bytes)</span>
+                <span>Network Inbound (GB)</span>
                 <input type="number" step="0.01" min="0" name="network_in" value="{{ values.get('network_in','') }}" required>
               </label>
               <label>
-                <span>Network Outbound (Bytes)</span>
+                <span>Network Outbound (GB)</span>
                 <input type="number" step="0.01" min="0" name="network_out" value="{{ values.get('network_out','') }}" required>
               </label>
             </div>

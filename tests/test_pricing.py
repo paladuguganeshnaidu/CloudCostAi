@@ -6,7 +6,7 @@ from app.pricing import (
     compute_egress_penalty,
     compute_workload_density_multiplier,
     apply_business_adjustments,
-    HIGH_EGRESS_THRESHOLD_BYTES,
+    HIGH_EGRESS_THRESHOLD_GB,
     WORKLOAD_CPU_THRESHOLD,
     WORKLOAD_MEM_THRESHOLD,
 )
@@ -52,28 +52,28 @@ class TestRegionalMultiplier:
 class TestEgressPenalty:
     def test_no_penalty_below_threshold(self):
         assert compute_egress_penalty(0) == 1.0
-        assert compute_egress_penalty(1e10) == 1.0   # 10 GB
+        assert compute_egress_penalty(10) == 1.0   # 10 GB
 
     def test_no_penalty_at_threshold(self):
-        assert compute_egress_penalty(HIGH_EGRESS_THRESHOLD_BYTES) == 1.0  # exactly 100 GB
+        assert compute_egress_penalty(HIGH_EGRESS_THRESHOLD_GB) == 1.0  # exactly 100 GB
 
     def test_penalty_at_1tb(self):
-        # 1 TB = 10 × threshold → log10(10) = 1 → penalty = 1 + 0.1*1 = 1.1
-        result = compute_egress_penalty(1e12)
+        # 1 TB = 1000 GB = 10 × threshold → log10(10) = 1 → penalty = 1 + 0.1*1 = 1.1
+        result = compute_egress_penalty(1000)
         assert abs(result - 1.1) < 1e-9
 
     def test_penalty_at_10tb(self):
-        # 10 TB = 100 × threshold → log10(100) = 2 → penalty = 1 + 0.1*2 = 1.2
-        result = compute_egress_penalty(1e13)
+        # 10 TB = 10000 GB = 100 × threshold → log10(100) = 2 → penalty = 1 + 0.1*2 = 1.2
+        result = compute_egress_penalty(10000)
         assert abs(result - 1.2) < 1e-9
 
     def test_penalty_is_monotonically_increasing(self):
-        sizes = [1e11, 5e11, 1e12, 1e13, 1e14]
+        sizes = [100, 500, 1000, 10000, 100000]
         penalties = [compute_egress_penalty(s) for s in sizes]
         assert penalties == sorted(penalties)
 
     def test_penalty_never_below_1(self):
-        for size in [0, 1, 1e9, 1e11, 1e14]:
+        for size in [0, 1, 10, 100, 10000]:
             assert compute_egress_penalty(size) >= 1.0
 
 
@@ -124,8 +124,8 @@ class TestApplyBusinessAdjustments:
             "region": "us-central1",
             "cpu": 50.0,
             "memory": 50.0,
-            "network_in": 1000.0,
-            "network_out": 1000.0,     # << well below 100 GB
+            "network_in": 10.0,
+            "network_out": 10.0,     # 10 GB (well below 100 GB)
             "usage_start": "2024-01-01",
             "usage_end": "2024-01-31",
             "cost_per_quantity": 0.05,
@@ -133,13 +133,18 @@ class TestApplyBusinessAdjustments:
         base.update(overrides)
         return base
 
-    def test_baseline_cost_is_qty_times_rate(self):
+    def test_baseline_cost_is_qty_times_rate_times_usd_inr(self, monkeypatch):
+        monkeypatch.setenv("USD_TO_INR_RATE", "84.0")
+        # ML model prediction = 500.0 (INR)
         result = apply_business_adjustments(500.0, self._values())
-        assert result["baseline_cost"] == pytest.approx(100.0 * 0.05)
+        expected_baseline_inr = 100.0 * 0.05 * 84.0 # 420.0
+        assert result["baseline_cost"] == pytest.approx(expected_baseline_inr)
+        # ml_coefficient is rounded to 4 decimals in the code
+        assert result["ml_coefficient"] == pytest.approx(500.0 / expected_baseline_inr, abs=1e-4)
 
     def test_no_adjustments_for_us_central_low_load(self):
         result = apply_business_adjustments(500.0, self._values())
-        # regional=1.0, egress=1.0, workload=1.0 → no adjustment
+        # regional=1.0, egress=1.0, workload=1.0 → final_cost == raw_model_cost
         assert result["regional_multiplier"] == 1.0
         assert result["egress_multiplier"] == 1.0
         assert result["workload_multiplier"] == 1.0
@@ -152,7 +157,7 @@ class TestApplyBusinessAdjustments:
         assert result["final_cost_inr"] == pytest.approx(1000.0 * 1.10, abs=0.01)
 
     def test_high_egress_penalty_applied(self):
-        result = apply_business_adjustments(1000.0, self._values(network_out=1e12))  # 1 TB
+        result = apply_business_adjustments(1000.0, self._values(network_out=1000))  # 1 TB (1000 GB)
         assert result["egress_multiplier"] == pytest.approx(1.1, abs=1e-9)
         assert result["final_cost_inr"] == pytest.approx(1000.0 * 1.0 * 1.1 * 1.0, abs=0.01)
 
@@ -164,7 +169,7 @@ class TestApplyBusinessAdjustments:
     def test_combined_multipliers(self):
         result = apply_business_adjustments(
             1000.0,
-            self._values(region="europe-west6", network_out=1e12, cpu=100, memory=100)
+            self._values(region="europe-west6", network_out=1000, cpu=100, memory=100)
         )
         expected = 1000.0 * 1.10 * 1.1 * 1.225
         assert result["final_cost_inr"] == pytest.approx(expected, abs=0.01)
@@ -172,17 +177,11 @@ class TestApplyBusinessAdjustments:
     def test_breakdown_keys_present(self):
         result = apply_business_adjustments(100.0, self._values())
         required_keys = {
-            "baseline_cost", "raw_model_cost", "regional_multiplier",
+            "baseline_cost", "ml_coefficient", "regional_multiplier",
             "egress_multiplier", "workload_multiplier", "total_multiplier",
-            "inr_rate", "final_cost_inr"
+            "final_cost_inr"
         }
         assert required_keys.issubset(result.keys())
-
-    def test_inr_rate_env_var(self, monkeypatch):
-        monkeypatch.setenv("INR_RATE", "1.1")
-        result = apply_business_adjustments(1000.0, self._values())
-        assert result["inr_rate"] == 1.1
-        assert result["final_cost_inr"] == pytest.approx(1100.0, abs=0.01)
 
 
 # ---------------------------------------------------------------------------

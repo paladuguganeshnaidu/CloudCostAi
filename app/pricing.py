@@ -77,7 +77,7 @@ _DEFAULT_REGIONAL_MULTIPLIER: float = 1.05
 # ---------------------------------------------------------------------------
 # Thresholds
 # ---------------------------------------------------------------------------
-HIGH_EGRESS_THRESHOLD_BYTES: float = 1e11   # 100 GB in bytes
+HIGH_EGRESS_THRESHOLD_GB:    float = 100.0  # 100 GB
 WORKLOAD_CPU_THRESHOLD:      float = 60.0   # percent
 WORKLOAD_MEM_THRESHOLD:      float = 60.0   # percent
 
@@ -95,19 +95,19 @@ def get_regional_multiplier(region: str) -> float:
     return REGIONAL_MULTIPLIERS.get(region.strip().lower(), _DEFAULT_REGIONAL_MULTIPLIER)
 
 
-def compute_egress_penalty(network_out_bytes: float) -> float:
+def compute_egress_penalty(network_out_gb: float) -> float:
     """Exponential egress penalty for high outbound traffic.
 
-    Activates only when network_out_bytes > 100 GB (1e11 bytes).
+    Activates only when network_out_gb > 100 GB.
     Uses log10 scaling so the penalty grows meaningfully but not explosively:
         100 GB  →  1.000× (no penalty, at threshold)
-        1  TB   →  1.100× (+10%)
-        10 TB   →  1.200× (+20%)
-        100 TB  →  1.300× (+30%)
+        1000 GB (1TB)   →  1.100× (+10%)
+        10000 GB (10TB)  →  1.200× (+20%)
+        100000 GB (100TB) →  1.300× (+30%)
     """
-    if network_out_bytes <= HIGH_EGRESS_THRESHOLD_BYTES:
+    if network_out_gb <= HIGH_EGRESS_THRESHOLD_GB:
         return 1.0
-    ratio = network_out_bytes / HIGH_EGRESS_THRESHOLD_BYTES
+    ratio = network_out_gb / HIGH_EGRESS_THRESHOLD_GB
     return 1.0 + 0.10 * math.log10(ratio)
 
 
@@ -141,27 +141,41 @@ def apply_business_adjustments(raw_model_cost: float, values: dict[str, Any]) ->
     Returns:
         A dict with every intermediate step for transparent display:
         {
-            "baseline_cost":        float,  # Usage Qty × Cost/Qty (deterministic)
-            "raw_model_cost":       float,  # raw ML output
+            "baseline_cost":        float,  # Usage Qty × Cost/Qty × USD_TO_INR
+            "ml_coefficient":       float,  # dimensionless scale (raw_model / baseline)
             "regional_multiplier":  float,
             "egress_multiplier":    float,
             "workload_multiplier":  float,
-            "total_multiplier":     float,  # product of the three above
-            "inr_rate":             float,  # from INR_RATE env var (default 1.0)
+            "total_multiplier":     float,  # product of multipliers
             "final_cost_inr":       float,  # the number shown to the user
         }
     """
-    # 1. Deterministic linear baseline (no model involved)
+    USD_TO_INR_RATE = float(os.environ.get("USD_TO_INR_RATE", "84.0"))
+
+    # 1. Deterministic linear baseline in proper currency
     try:
         usage_qty  = float(values.get("usage_quantity",   0) or 0)
         cost_per_q = float(values.get("cost_per_quantity", 0) or 0)
-        baseline_cost = usage_qty * cost_per_q
+        baseline_usd = usage_qty * cost_per_q
+        baseline_inr = baseline_usd * USD_TO_INR_RATE
     except (TypeError, ValueError):
-        baseline_cost = 0.0
+        baseline_inr = 0.0
 
-    # 2. Individual multipliers
+    # 2. Derive the ML Coefficient (Dimensionless)
+    # This prevents adding raw currency to a baseline, treating the model instead
+    # as a complexity multiplier over the baseline.
+    if baseline_inr > 0:
+        ml_coefficient = raw_model_cost / baseline_inr
+    else:
+        # Fallback if baseline is 0 (e.g., $0/hour cost rate)
+        ml_coefficient = 1.0
+        # If baseline is 0, we can't derive a coefficient. In this edge case,
+        # we treat the raw model cost as the baseline so the math still flows.
+        baseline_inr = raw_model_cost
+
+    # 3. Individual multipliers
     region      = str(values.get("region", "") or "")
-    network_out = float(values.get("network_out", 0) or 0)
+    network_out = float(values.get("network_out", 0) or 0) # Now in GB
     cpu         = float(values.get("cpu",     0) or 0)
     memory      = float(values.get("memory",  0) or 0)
 
@@ -171,23 +185,15 @@ def apply_business_adjustments(raw_model_cost: float, values: dict[str, Any]) ->
 
     total_multiplier = regional_mult * egress_mult * workload_mult
 
-    # 3. Apply multipliers to the raw model output
-    adjusted_cost = raw_model_cost * total_multiplier
-
-    # 4. INR rate — model already predicts in INR; this env var allows
-    #    operators to apply a correction factor if the training-time
-    #    USD→INR rate drifts from the current market rate.
-    #    Default = 1.0 (no-op).
-    inr_rate   = float(os.environ.get("INR_RATE", "1.0"))
-    final_cost = adjusted_cost * inr_rate
+    # 4. Final calculation using consistent dimensions
+    final_cost = baseline_inr * ml_coefficient * total_multiplier
 
     return {
-        "baseline_cost":       round(baseline_cost,    4),
-        "raw_model_cost":      round(raw_model_cost,   4),
-        "regional_multiplier": round(regional_mult,    4),
-        "egress_multiplier":   round(egress_mult,      4),
-        "workload_multiplier": round(workload_mult,     4),
-        "total_multiplier":    round(total_multiplier,  4),
-        "inr_rate":            round(inr_rate,          4),
-        "final_cost_inr":      round(final_cost,        2),
+        "baseline_cost":       round(baseline_inr, 4),
+        "ml_coefficient":      round(ml_coefficient, 4),
+        "regional_multiplier": round(regional_mult, 4),
+        "egress_multiplier":   round(egress_mult, 4),
+        "workload_multiplier": round(workload_mult, 4),
+        "total_multiplier":    round(total_multiplier, 4),
+        "final_cost_inr":      round(final_cost, 2),
     }
