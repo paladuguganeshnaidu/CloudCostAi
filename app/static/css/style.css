@@ -429,12 +429,21 @@ input[type="range"] {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+}
+
+input[type="range"] {
+  width: 100%;
+  min-width: 0;
 }
 
 .slider-value {
   color: var(--accent);
   font-weight: 700;
   font-size: 0.92rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-align: right;
 }
 
 input:focus, select:focus {

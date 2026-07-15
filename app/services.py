@@ -99,6 +99,8 @@ def build_input_dataframe(values: dict[str, Any]) -> pd.DataFrame:
                 "Usage Start Date": pd.to_datetime(values["usage_start"]),
                 "Usage End Date": pd.to_datetime(values["usage_end"]),
                 "Cost per Quantity ($)": values["cost_per_quantity"],
+                "Unrounded Cost ($)": 0.0,
+                "Rounded Cost ($)": 0.0,
                 "Total Cost (INR)": 0.0,
             }
         ]
