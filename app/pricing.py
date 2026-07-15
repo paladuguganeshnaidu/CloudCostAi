@@ -164,14 +164,17 @@ def apply_business_adjustments(raw_model_cost: float, values: dict[str, Any]) ->
     # 2. Derive the ML Coefficient (Dimensionless)
     # This prevents adding raw currency to a baseline, treating the model instead
     # as a complexity multiplier over the baseline.
+    MAX_ML_COEFFICIENT = 5.0  # Hard logical boundary to prevent extreme outliers
+
     if baseline_inr > 0:
-        ml_coefficient = raw_model_cost / baseline_inr
+        # Calculate raw coefficient and cap it using min() to prevent unbounded predictions
+        raw_coefficient = raw_model_cost / baseline_inr
+        ml_coefficient = min(raw_coefficient, MAX_ML_COEFFICIENT)
     else:
-        # Fallback if baseline is 0 (e.g., $0/hour cost rate)
-        ml_coefficient = 1.0
-        # If baseline is 0, we can't derive a coefficient. In this edge case,
-        # we treat the raw model cost as the baseline so the math still flows.
-        baseline_inr = raw_model_cost
+        # FREE TIER HANDLING
+        # If the user's rate is $0, the baseline is 0. The ML model shouldn't invent a cost.
+        ml_coefficient = 0.0
+        baseline_inr = 0.0
 
     # 3. Individual multipliers
     region      = str(values.get("region", "") or "")

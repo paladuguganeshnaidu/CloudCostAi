@@ -1742,3 +1742,6 @@ Prepared DataFrame:
 2026-07-15 22:11:43,524 - INFO - Preprocessor transformed shape: (1, 48)
 2026-07-15 22:11:43,524 - INFO - Model raw predictions: [131023.55812123]
 2026-07-15 22:11:43,524 - INFO - Final predictions returned: [131023.55812123482]
+2026-07-15 22:31:45,845 - WARNING - SECRET_KEY not set in environment; generated a temporary secret. Set SECRET_KEY in production.
+2026-07-15 22:31:49,499 - WARNING - SECRET_KEY not set in environment; generated a temporary secret. Set SECRET_KEY in production.
+2026-07-15 22:32:31,347 - WARNING - SECRET_KEY not set in environment; generated a temporary secret. Set SECRET_KEY in production.
