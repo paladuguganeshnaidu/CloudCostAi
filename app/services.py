@@ -8,7 +8,6 @@ from typing import Any
 import pandas as pd
 from flask import Response
 
-from src.data.feature_engineering import create_features
 from src.model.predict import predict_cost
 from app.database import get_db_connection
 
@@ -234,8 +233,7 @@ def generate_csv(rows: list[dict[str, Any]]) -> str:
 
 def perform_prediction(values: dict[str, Any]) -> tuple[float, dict[str, Any]]:
     dataframe = build_input_dataframe(values)
-    engineered_frame = create_features(dataframe)
-    prediction = predict_cost(engineered_frame)
+    prediction = predict_cost(dataframe)
     predicted_cost = round(float(prediction[0]), 2)
     save_prediction(values, predicted_cost)
-    return predicted_cost, {"input_frame": engineered_frame}
+    return predicted_cost, {}
