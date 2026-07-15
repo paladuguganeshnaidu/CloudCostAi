@@ -1,4 +1,0 @@
-project_name: CloudCostAI
-model_name: linear_regression
-training_data: data/raw/Cloud_Dataset.csv
-processed_data: data/processed/processed_dataset.csv

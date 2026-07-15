@@ -1,51 +1,43 @@
+# === Python ===
 __pycache__/
 *.py[cod]
-.venv/
-.env
-cloudcostai.db
-.DS_Store
-node_modules/
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
+*.pyo
 
-# C extensions
-*.so
-
-# Distribution / packaging
+# === Build / packaging ===
 build/
 dist/
 *.egg-info/
 
-# Virtual environments
+# === Virtual environments ===
 .venv/
 env/
 venv/
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# === Environment secrets ===
+.env
 
-# Pytest
+# === Database ===
+cloudcostai.db
+
+# === Pytest ===
 .pytest_cache/
 
-# IDEs and editors
+# === IDEs ===
 .vscode/
 .idea/
 
-# dotenv
-.env
-
-# Database
-cloudcostai.db
-
-# OS files
+# === OS files ===
 .DS_Store
+Thumbs.db
 
-# Logs
+# === Logs ===
 logs/*.log
 
-# Node
+# === Misc python version files ===
+root.python-version
+runtime.txt
+
+# === Node (just in case) ===
 node_modules/
 
-# Note: model artifacts in `models/` are tracked intentionally for this project.
+# Note: model artifacts in `models/` are intentionally tracked for deployment.
