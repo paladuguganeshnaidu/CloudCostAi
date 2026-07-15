@@ -20,19 +20,29 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   if (cpuSlider && cpuValue) {
-    const syncValue = () => {
-      cpuValue.textContent = `${cpuSlider.value}%`;
+    const updateCpuDisplay = () => {
+      const currentValue = parseFloat(cpuSlider.value) || 50;
+      cpuValue.textContent = `${Math.round(currentValue)}%`;
     };
-    syncValue();
-    cpuSlider.addEventListener('input', syncValue);
+    updateCpuDisplay();
+    cpuSlider.addEventListener('input', updateCpuDisplay);
+    cpuSlider.addEventListener('change', updateCpuDisplay);
+    cpuSlider.addEventListener('pointerdown', updateCpuDisplay);
+    cpuSlider.addEventListener('pointermove', updateCpuDisplay);
+    cpuSlider.addEventListener('pointerup', updateCpuDisplay);
   }
 
   if (memorySlider && memoryValue) {
-    const syncValue = () => {
-      memoryValue.textContent = `${memorySlider.value}%`;
+    const updateMemoryDisplay = () => {
+      const currentValue = parseFloat(memorySlider.value) || 50;
+      memoryValue.textContent = `${Math.round(currentValue)}%`;
     };
-    syncValue();
-    memorySlider.addEventListener('input', syncValue);
+    updateMemoryDisplay();
+    memorySlider.addEventListener('input', updateMemoryDisplay);
+    memorySlider.addEventListener('change', updateMemoryDisplay);
+    memorySlider.addEventListener('pointerdown', updateMemoryDisplay);
+    memorySlider.addEventListener('pointermove', updateMemoryDisplay);
+    memorySlider.addEventListener('pointerup', updateMemoryDisplay);
   }
 
   if (window.lucide) {
