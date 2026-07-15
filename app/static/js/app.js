@@ -125,7 +125,7 @@ function clearPredictionForm() {
   form.reset();
 }
 
-export {};
+
 
 // Admin delete button handling
 document.addEventListener('click', async (e) => {

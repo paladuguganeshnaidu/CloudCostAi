@@ -46,7 +46,7 @@ def create_app() -> Flask:
         response.headers.setdefault("Referrer-Policy", "no-referrer-when-downgrade")
         response.headers.setdefault("Permissions-Policy", "geolocation=()")
         # Minimal CSP allowing same-origin scripts and styles; tighten as needed
-        response.headers.setdefault("Content-Security-Policy", "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:;")
+        response.headers.setdefault("Content-Security-Policy", "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:;")
         return response
     return app
 

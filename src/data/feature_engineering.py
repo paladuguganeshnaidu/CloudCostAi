@@ -78,5 +78,4 @@ def engineer_features(df: pd.DataFrame):
     X = engineered.drop(columns=["Total Cost (INR)"], errors="ignore")
     y = engineered["Total Cost (INR)"]
     preprocessor = build_preprocessor(X)
-    feature_names = preprocessor.get_feature_names_out().tolist()
-    return X, y, preprocessor, feature_names
+    return X, y, preprocessor

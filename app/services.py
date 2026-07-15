@@ -15,6 +15,9 @@ MAX_DURATION_HOURS = 24 * 365 * 20
 
 
 def sanitize_form_data(form_data: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
+    from app.blueprints.main import _get_form_options
+    options = _get_form_options()
+
     errors: list[str] = []
     values = {
         "service_name": (form_data.get("service_name") or "").strip(),
@@ -32,10 +35,18 @@ def sanitize_form_data(form_data: dict[str, Any]) -> tuple[list[str], dict[str, 
 
     if not values["service_name"]:
         errors.append("Service Name is required.")
+    elif values["service_name"] not in options["service_names"]:
+        errors.append(f"Unknown Service Name: {values['service_name']}")
+
     if not values["usage_unit"]:
         errors.append("Usage Unit is required.")
+    elif values["usage_unit"] not in options["usage_units"]:
+        errors.append(f"Unknown Usage Unit: {values['usage_unit']}")
+
     if not values["region"]:
         errors.append("Region is required.")
+    elif values["region"] not in options["regions"]:
+        errors.append(f"Unknown Region: {values['region']}")
 
     numeric_fields = [
         ("usage_quantity", "Usage Quantity"),
@@ -47,23 +58,31 @@ def sanitize_form_data(form_data: dict[str, Any]) -> tuple[list[str], dict[str, 
     ]
 
     for field_name, label in numeric_fields:
-        try:
-            values[field_name] = float(values[field_name])
-        except (TypeError, ValueError):
-            errors.append(f"{label} must be a valid number.")
+        if not values[field_name]:
+            errors.append(f"{label} is required.")
+        else:
+            try:
+                values[field_name] = float(values[field_name])
+            except (TypeError, ValueError):
+                errors.append(f"{label} must be a valid number.")
 
-    if values.get("usage_quantity") is not None and values["usage_quantity"] < 0:
+    if isinstance(values.get("usage_quantity"), float) and values["usage_quantity"] < 0:
         errors.append("Usage Quantity must be greater than or equal to 0.")
-    if values.get("cpu") is not None and not 0 <= values["cpu"] <= 100:
+    if isinstance(values.get("cpu"), float) and not 0 <= values["cpu"] <= 100:
         errors.append("CPU Utilization must be between 0 and 100.")
-    if values.get("memory") is not None and not 0 <= values["memory"] <= 100:
+    if isinstance(values.get("memory"), float) and not 0 <= values["memory"] <= 100:
         errors.append("Memory Utilization must be between 0 and 100.")
-    if values.get("network_in") is not None and values["network_in"] < 0:
+    if isinstance(values.get("network_in"), float) and values["network_in"] < 0:
         errors.append("Network Inbound Data must be greater than or equal to 0.")
-    if values.get("network_out") is not None and values["network_out"] < 0:
+    if isinstance(values.get("network_out"), float) and values["network_out"] < 0:
         errors.append("Network Outbound Data must be greater than or equal to 0.")
-    if values.get("cost_per_quantity") is not None and values["cost_per_quantity"] < 0:
+    if isinstance(values.get("cost_per_quantity"), float) and values["cost_per_quantity"] < 0:
         errors.append("Cost per Quantity must be greater than or equal to 0.")
+
+    if not values["usage_start"]:
+        errors.append("Usage Start Date is required.")
+    if not values["usage_end"]:
+        errors.append("Usage End Date is required.")
 
     if values.get("usage_start") and values.get("usage_end"):
         try:
@@ -74,6 +93,8 @@ def sanitize_form_data(form_data: dict[str, Any]) -> tuple[list[str], dict[str, 
             duration_hours = (end_date - start_date).total_seconds() / 3600
             if duration_hours > MAX_DURATION_HOURS:
                 errors.append("Usage duration is too large. Please choose a shorter range.")
+            if duration_hours < 0:
+                pass # Handled by start_date > end_date
             values["usage_start"] = start_date.strftime("%Y-%m-%d")
             values["usage_end"] = end_date.strftime("%Y-%m-%d")
         except Exception as exc:

@@ -8,7 +8,7 @@ from src.model.save_model import save_training_artifacts
 
 def train_model(dataset_path: str):
     df = load_dataset(dataset_path)
-    X, y, preprocessor, feature_names = engineer_features(df)
+    X, y, preprocessor = engineer_features(df)
 
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -19,6 +19,7 @@ def train_model(dataset_path: str):
 
     X_train = preprocessor.fit_transform(X_train)
     X_test = preprocessor.transform(X_test)
+    feature_names = preprocessor.get_feature_names_out().tolist()
 
     model = LinearRegression()
     model.fit(X_train, y_train)

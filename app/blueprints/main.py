@@ -1,12 +1,12 @@
 import os
 import hmac
-from functools import wraps
+from functools import wraps, lru_cache
 from base64 import b64decode
 
+import joblib
 from flask import Blueprint, Response, flash, redirect, render_template, request, url_for, current_app
 
-from src.data.loader import load_dataset
-from src.data.preprocessing import preprocess_dataset
+from src.utils.config import MODEL_DIR
 
 from app.services import (
     delete_prediction,
@@ -51,13 +51,25 @@ def require_basic_auth(func):
     return wrapper
 
 
+@lru_cache(maxsize=1)
 def _get_form_options() -> dict[str, list[str]]:
-    dataset = preprocess_dataset(load_dataset("data/raw/gcp_final_approved_dataset.csv"))
-    return {
-        "service_names": sorted(dataset["Service Name"].dropna().astype(str).str.strip().unique().tolist()),
-        "usage_units": sorted(dataset["Usage Unit"].dropna().astype(str).str.strip().unique().tolist()),
-        "regions": sorted(dataset["Region/Zone"].dropna().astype(str).str.strip().unique().tolist()),
-    }
+    try:
+        preprocessor = joblib.load(MODEL_DIR / "preprocessor.pkl")
+        encoder = preprocessor.named_transformers_["categorical"]
+        # encoder.categories_ returns a list of arrays corresponding to the categories.
+        # Categorical columns in build_preprocessor are ["Service Name", "Usage Unit", "Region/Zone"]
+        service_names = encoder.categories_[0].tolist()
+        usage_units = encoder.categories_[1].tolist()
+        regions = encoder.categories_[2].tolist()
+        return {
+            "service_names": sorted(service_names),
+            "usage_units": sorted(usage_units),
+            "regions": sorted(regions),
+        }
+    except Exception as e:
+        import logging
+        logging.error(f"Failed to load form options from preprocessor: {e}")
+        return {"service_names": [], "usage_units": [], "regions": []}
 
 
 @main_bp.route("/")
@@ -131,6 +143,13 @@ def history():
     search = request.args.get("q", "", type=str)
     rows = get_prediction_history(search=search)
     return {"predictions": [dict(row) for row in rows]}
+
+
+@main_bp.route("/api/form-options")
+def api_form_options():
+    """Return the valid dropdown options loaded from the trained preprocessor."""
+    options = _get_form_options()
+    return options
 
 
 @main_bp.route("/admin")
