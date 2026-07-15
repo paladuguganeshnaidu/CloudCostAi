@@ -722,3 +722,343 @@ Prepared DataFrame:
 2026-07-15 21:25:33,970 - INFO - Preprocessor transformed shape: (1, 48)
 2026-07-15 21:25:33,971 - INFO - Model raw predictions: [131023.55812123]
 2026-07-15 21:25:33,971 - INFO - Final predictions returned: [131023.55812123482]
+2026-07-15 21:40:47,123 - WARNING - SECRET_KEY not set in environment; generated a temporary secret. Set SECRET_KEY in production.
+2026-07-15 21:40:47,305 - WARNING - SECRET_KEY not set in environment; generated a temporary secret. Set SECRET_KEY in production.
+2026-07-15 21:40:47,617 - INFO - Starting prediction trace.
+2026-07-15 21:40:47,634 - INFO - Input DataFrame:
+    Resource ID    Service Name  ...  Rounded Cost ($) Total Cost (INR)
+0  res-ST6BAJ2N  Cloud Dataproc  ...              5004           415332
+
+[1 rows x 15 columns]
+2026-07-15 21:40:47,636 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:47,656 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+     Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+0  Cloud Dataproc        954.9843  ...                  5.24           415332
+
+[1 rows x 12 columns]
+2026-07-15 21:40:47,664 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:47,670 - INFO - Model raw predictions: [442712.86055829]
+2026-07-15 21:40:47,670 - INFO - Final predictions returned: [442712.86055828794]
+2026-07-15 21:40:47,819 - INFO - Starting prediction trace.
+2026-07-15 21:40:47,831 - INFO - Input DataFrame:
+    Resource ID    Service Name  ...  Rounded Cost ($) Total Cost (INR)
+0  res-ST6BAJ2N  Cloud Dataproc  ...              5004           415332
+
+[1 rows x 15 columns]
+2026-07-15 21:40:47,836 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:47,854 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+     Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+0  Cloud Dataproc        954.9843  ...                  5.24           415332
+
+[1 rows x 12 columns]
+2026-07-15 21:40:47,859 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:47,860 - INFO - Model raw predictions: [442712.86055829]
+2026-07-15 21:40:47,860 - INFO - Final predictions returned: [442712.86055828794]
+2026-07-15 21:40:47,863 - INFO - Starting prediction trace.
+2026-07-15 21:40:47,874 - INFO - Input DataFrame:
+    Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+1  res-TYGNR0RV      Pub/Sub  ...              4710           390930
+
+[1 rows x 15 columns]
+2026-07-15 21:40:47,876 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:47,913 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+  Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+1      Pub/Sub        479.6348  ...                  9.82           390930
+
+[1 rows x 12 columns]
+2026-07-15 21:40:47,917 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:47,918 - INFO - Model raw predictions: [343291.38688513]
+2026-07-15 21:40:47,918 - INFO - Final predictions returned: [343291.3868851296]
+2026-07-15 21:40:47,920 - INFO - Starting prediction trace.
+2026-07-15 21:40:47,942 - INFO - Input DataFrame:
+    Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+2  res-S3I9C869     BigQuery  ...               843            69969
+
+[1 rows x 15 columns]
+2026-07-15 21:40:47,947 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:47,976 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+  Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+2     BigQuery        114.4129  ...                  7.37            69969
+
+[1 rows x 12 columns]
+2026-07-15 21:40:47,987 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:47,988 - INFO - Model raw predictions: [120260.35017615]
+2026-07-15 21:40:47,988 - INFO - Final predictions returned: [120260.35017614832]
+2026-07-15 21:40:47,990 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,007 - INFO - Input DataFrame:
+    Resource ID     Service Name  ...  Rounded Cost ($) Total Cost (INR)
+3  res-1RY9BZ6G  Cloud Endpoints  ...              1822           151226
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,009 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,030 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+      Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+3  Cloud Endpoints         413.193  ...                  4.41           151226
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,035 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,036 - INFO - Model raw predictions: [168140.6874046]
+2026-07-15 21:40:48,036 - INFO - Final predictions returned: [168140.68740460012]
+2026-07-15 21:40:48,038 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,051 - INFO - Input DataFrame:
+    Resource ID   Service Name  ...  Rounded Cost ($) Total Cost (INR)
+4  res-S3HQYIZ2  Cloud Spanner  ...              2046           169818
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,054 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,077 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+    Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+4  Cloud Spanner        335.9892  ...                  6.09           169818
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,084 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,085 - INFO - Model raw predictions: [168384.36290653]
+2026-07-15 21:40:48,085 - INFO - Final predictions returned: [168384.36290652747]
+2026-07-15 21:40:48,088 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,107 - INFO - Input DataFrame:
+    Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+5  res-MWGCR6VT    Cloud Run  ...               447            37101
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,112 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,230 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+  Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+5    Cloud Run            50.8  ...                   8.8            37101
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,256 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,257 - INFO - Model raw predictions: [144367.49112619]
+2026-07-15 21:40:48,257 - INFO - Final predictions returned: [144367.49112618927]
+2026-07-15 21:40:48,259 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,288 - INFO - Input DataFrame:
+    Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+6  res-FSWKHTQW    Cloud CDN  ...              1948           161684
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,297 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,336 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+  Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+6    Cloud CDN        333.6126  ...                  5.84           161684
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,344 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,346 - INFO - Model raw predictions: [165516.23593143]
+2026-07-15 21:40:48,346 - INFO - Final predictions returned: [165516.23593142987]
+2026-07-15 21:40:48,350 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,375 - INFO - Input DataFrame:
+    Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+7  res-S7I6Z6JD    Cloud Run  ...               240            19920
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,380 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,413 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+  Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+7    Cloud Run         49.5833  ...                  4.84            19920
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,420 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,420 - INFO - Model raw predictions: [-8120.22619266]
+2026-07-15 21:40:48,421 - WARNING - Negative prediction detected; clipping to zero. Value=-8120.226192664704
+2026-07-15 21:40:48,421 - INFO - Final predictions returned: [0.0]
+2026-07-15 21:40:48,424 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,437 - INFO - Input DataFrame:
+    Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+8  res-U3CCWT2L    Cloud VPN  ...               762            63246
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,440 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,466 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+  Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+8    Cloud VPN        384.7979  ...                  1.98            63246
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,472 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,473 - INFO - Model raw predictions: [55580.32681096]
+2026-07-15 21:40:48,473 - INFO - Final predictions returned: [55580.32681096392]
+2026-07-15 21:40:48,474 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,489 - INFO - Input DataFrame:
+    Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+9  res-4DX4UZEY    Firestore  ...              2711           225013
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,491 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,518 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+  Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+9    Firestore        533.6245  ...                  5.08           225013
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,525 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,525 - INFO - Model raw predictions: [259591.31478361]
+2026-07-15 21:40:48,526 - INFO - Final predictions returned: [259591.31478361133]
+2026-07-15 21:40:48,528 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,546 - INFO - Input DataFrame:
+     Resource ID    Service Name  ...  Rounded Cost ($) Total Cost (INR)
+10  res-JAL9EY6P  Compute Engine  ...               385            31955
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,550 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,579 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+      Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+10  Compute Engine            78.7  ...                  4.89            31955
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,586 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,587 - INFO - Model raw predictions: [19218.18509464]
+2026-07-15 21:40:48,587 - INFO - Final predictions returned: [19218.185094637272]
+2026-07-15 21:40:48,589 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,602 - INFO - Input DataFrame:
+     Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+11  res-B4GZM2Q6  AI Platform  ...               800            66400
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,604 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,642 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+   Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+11  AI Platform         86.6333  ...                  9.23            66400
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,652 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,652 - INFO - Model raw predictions: [150634.93442911]
+2026-07-15 21:40:48,652 - INFO - Final predictions returned: [150634.93442910555]
+2026-07-15 21:40:48,654 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,667 - INFO - Input DataFrame:
+     Resource ID        Service Name  ...  Rounded Cost ($) Total Cost (INR)
+12  res-012HZFAA  Cloud Interconnect  ...              1186            98438
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,669 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,690 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+          Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+12  Cloud Interconnect        290.0492  ...                  4.09            98438
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,697 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,697 - INFO - Model raw predictions: [100010.65278649]
+2026-07-15 21:40:48,697 - INFO - Final predictions returned: [100010.65278648943]
+2026-07-15 21:40:48,699 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,709 - INFO - Input DataFrame:
+     Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+13  res-ELZMGAPV      Pub/Sub  ...               305            25315
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,715 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,740 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+   Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+13      Pub/Sub         96.9514  ...                  3.15            25315
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,747 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,748 - INFO - Model raw predictions: [-44294.17469988]
+2026-07-15 21:40:48,748 - WARNING - Negative prediction detected; clipping to zero. Value=-44294.17469988091
+2026-07-15 21:40:48,749 - INFO - Final predictions returned: [0.0]
+2026-07-15 21:40:48,750 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,765 - INFO - Input DataFrame:
+     Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+14  res-XACLYR7O    Cloud CDN  ...              2156           178948
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,768 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,791 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+   Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+14    Cloud CDN        657.3878  ...                  3.28           178948
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,797 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,798 - INFO - Model raw predictions: [219727.79071182]
+2026-07-15 21:40:48,798 - INFO - Final predictions returned: [219727.7907118185]
+2026-07-15 21:40:48,799 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,816 - INFO - Input DataFrame:
+     Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+15  res-O0Y1GSUY  AI Platform  ...               759            62997
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,819 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,854 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+   Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+15  AI Platform         98.3833  ...                  7.71            62997
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,861 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,863 - INFO - Model raw predictions: [116343.88053479]
+2026-07-15 21:40:48,863 - INFO - Final predictions returned: [116343.88053478813]
+2026-07-15 21:40:48,865 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,883 - INFO - Input DataFrame:
+     Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+16  res-S3LT44XO  Cloud Build  ...              3653           303199
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,887 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,916 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+   Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+16  Cloud Build        713.5354  ...                  5.12           303199
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,921 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,921 - INFO - Model raw predictions: [308035.44719622]
+2026-07-15 21:40:48,921 - INFO - Final predictions returned: [308035.4471962189]
+2026-07-15 21:40:48,922 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,938 - INFO - Input DataFrame:
+     Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+17  res-4FELBDAQ  Cloud Armor  ...              3001           249083
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,940 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:48,960 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+   Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+17  Cloud Armor        609.9901  ...                  4.92           249083
+
+[1 rows x 12 columns]
+2026-07-15 21:40:48,967 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:48,968 - INFO - Model raw predictions: [272511.02725427]
+2026-07-15 21:40:48,968 - INFO - Final predictions returned: [272511.0272542654]
+2026-07-15 21:40:48,969 - INFO - Starting prediction trace.
+2026-07-15 21:40:48,986 - INFO - Input DataFrame:
+     Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+18  res-8DBLI7MV      Pub/Sub  ...               471            39093
+
+[1 rows x 15 columns]
+2026-07-15 21:40:48,989 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:49,018 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+   Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+18      Pub/Sub         61.3889  ...                  7.68            39093
+
+[1 rows x 12 columns]
+2026-07-15 21:40:49,027 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:49,029 - INFO - Model raw predictions: [81606.81047485]
+2026-07-15 21:40:49,029 - INFO - Final predictions returned: [81606.81047485248]
+2026-07-15 21:40:49,032 - INFO - Starting prediction trace.
+2026-07-15 21:40:49,048 - INFO - Input DataFrame:
+     Resource ID Service Name  ...  Rounded Cost ($) Total Cost (INR)
+19  res-KI6SEH8K    Cloud VPN  ...              1370           113710
+
+[1 rows x 15 columns]
+2026-07-15 21:40:49,050 - INFO - Loaded artifacts successfully.
+2026-07-15 21:40:49,071 - INFO - Feature Engineering completed.
+Prepared DataFrame:
+   Service Name  Usage Quantity  ... Cost per Quantity ($) Total Cost (INR)
+19    Cloud VPN        194.6074  ...                  7.04           113710
+
+[1 rows x 12 columns]
+2026-07-15 21:40:49,076 - INFO - Preprocessor transformed shape: (1, 48)
+2026-07-15 21:40:49,076 - INFO - Model raw predictions: [131023.55812123]
+2026-07-15 21:40:49,077 - INFO - Final predictions returned: [131023.55812123482]

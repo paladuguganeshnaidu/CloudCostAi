@@ -54,6 +54,36 @@
               <div class="result-amount">₹ {{ "%.2f"|format(prediction_result) }}</div>
               <p>Approximate cost for your selected workload.</p>
               <span class="status-pill success"><i data-lucide="check-circle"></i> Ready</span>
+
+              {% if cost_breakdown %}
+              <div class="breakdown-table">
+                <div class="breakdown-title"><i data-lucide="layers"></i> Cost Breakdown</div>
+                <div class="breakdown-row">
+                  <span class="breakdown-label">Baseline (Qty × Rate)</span>
+                  <span class="breakdown-value">₹ {{ "%.4f"|format(cost_breakdown.baseline_cost) }}</span>
+                </div>
+                <div class="breakdown-row">
+                  <span class="breakdown-label">ML Model Output</span>
+                  <span class="breakdown-value">₹ {{ "%.4f"|format(cost_breakdown.raw_model_cost) }}</span>
+                </div>
+                <div class="breakdown-row breakdown-divider">
+                  <span class="breakdown-label">Regional Multiplier</span>
+                  <span class="breakdown-value breakdown-mult">{{ "%.4f"|format(cost_breakdown.regional_multiplier) }}×</span>
+                </div>
+                <div class="breakdown-row">
+                  <span class="breakdown-label">Egress Penalty</span>
+                  <span class="breakdown-value breakdown-mult {% if cost_breakdown.egress_multiplier > 1 %}breakdown-active{% endif %}">{{ "%.4f"|format(cost_breakdown.egress_multiplier) }}×</span>
+                </div>
+                <div class="breakdown-row">
+                  <span class="breakdown-label">Workload Density</span>
+                  <span class="breakdown-value breakdown-mult {% if cost_breakdown.workload_multiplier > 1 %}breakdown-active{% endif %}">{{ "%.4f"|format(cost_breakdown.workload_multiplier) }}×</span>
+                </div>
+                <div class="breakdown-row breakdown-total">
+                  <span class="breakdown-label">Final Cost (INR)</span>
+                  <span class="breakdown-value">₹ {{ "%.2f"|format(cost_breakdown.final_cost_inr) }}</span>
+                </div>
+              </div>
+              {% endif %}
             </div>
           {% else %}
             <div class="result-card">
@@ -63,6 +93,7 @@
               <span class="status-pill"><i data-lucide="activity"></i> Live</span>
             </div>
           {% endif %}
+
 
           <div class="recent-card">
             <div class="section-title-row">

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import re
 from datetime import datetime
 from io import StringIO
 from typing import Any
@@ -10,8 +11,28 @@ from flask import Response
 
 from src.model.predict import predict_cost
 from app.database import get_db_connection
+from app.pricing import apply_business_adjustments
 
 MAX_DURATION_HOURS = 24 * 365 * 20
+
+# Numeric fields where users may accidentally include unit suffixes
+_SANITIZED_NUMERIC_FIELDS = frozenset([
+    "usage_quantity", "cpu", "memory", "network_in", "network_out", "cost_per_quantity"
+])
+
+
+def _strip_non_numeric(raw: str) -> str:
+    """Strip non-numeric characters from a string, keeping digits, dot, and minus.
+
+    Examples:
+        '64%'         -> '64'
+        '1.5 GB'      -> '1.5'
+        '1024 bytes'  -> '1024'
+        '  50 '       -> '50'
+        '-1'          -> '-1'   (preserves negatives for validation to catch)
+    """
+    cleaned = re.sub(r"[^\d.\-]", "", raw.strip())
+    return cleaned if cleaned else raw.strip()
 
 
 def sanitize_form_data(form_data: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
@@ -58,13 +79,18 @@ def sanitize_form_data(form_data: dict[str, Any]) -> tuple[list[str], dict[str, 
     ]
 
     for field_name, label in numeric_fields:
-        if not values[field_name]:
+        raw_value = values[field_name]
+        if not raw_value:
             errors.append(f"{label} is required.")
         else:
+            # Auto-sanitize: strip unit suffixes (%, GB, bytes, spaces, etc.)
+            if field_name in _SANITIZED_NUMERIC_FIELDS:
+                raw_value = _strip_non_numeric(raw_value)
+                values[field_name] = raw_value  # store cleaned string until float conversion
             try:
-                values[field_name] = float(values[field_name])
+                values[field_name] = float(raw_value)
             except (TypeError, ValueError):
-                errors.append(f"{label} must be a valid number.")
+                errors.append(f"{label} must be a valid number (got: {raw_value!r}).")
 
     if isinstance(values.get("usage_quantity"), float) and values["usage_quantity"] < 0:
         errors.append("Usage Quantity must be greater than or equal to 0.")
@@ -255,6 +281,11 @@ def generate_csv(rows: list[dict[str, Any]]) -> str:
 def perform_prediction(values: dict[str, Any]) -> tuple[float, dict[str, Any]]:
     dataframe = build_input_dataframe(values)
     prediction = predict_cost(dataframe)
-    predicted_cost = round(float(prediction[0]), 2)
-    save_prediction(values, predicted_cost)
-    return predicted_cost, {}
+    raw_cost = float(prediction[0])
+
+    # Apply post-model business rules (regional, egress, workload, INR rate)
+    breakdown = apply_business_adjustments(raw_cost, values)
+    final_cost = breakdown["final_cost_inr"]
+
+    save_prediction(values, final_cost)
+    return final_cost, breakdown

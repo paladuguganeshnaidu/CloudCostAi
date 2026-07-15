@@ -80,6 +80,7 @@ def index():
         "index.html",
         history=history,
         prediction_result=None,
+        cost_breakdown=None,
         values={},
         errors=[],
         service_names=options["service_names"],
@@ -100,6 +101,7 @@ def predict():
             "index.html",
             history=history,
             prediction_result=None,
+            cost_breakdown=None,
             values=values,
             errors=errors,
             service_names=options["service_names"],
@@ -108,7 +110,7 @@ def predict():
         )
 
     try:
-        predicted_cost, _ = perform_prediction(values)
+        predicted_cost, breakdown = perform_prediction(values)
         flash("Prediction completed successfully.", "success")
         history = get_prediction_history(limit=5)
         options = _get_form_options()
@@ -116,6 +118,7 @@ def predict():
             "index.html",
             history=history,
             prediction_result=predicted_cost,
+            cost_breakdown=breakdown,
             values=values,
             errors=[],
             service_names=options["service_names"],
@@ -130,12 +133,14 @@ def predict():
             "index.html",
             history=history,
             prediction_result=None,
+            cost_breakdown=None,
             values=values,
             errors=[str(exc)],
             service_names=options["service_names"],
             usage_units=options["usage_units"],
             regions=options["regions"],
         )
+
 
 
 @main_bp.route("/history")
