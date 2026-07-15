@@ -5,6 +5,9 @@ from base64 import b64decode
 
 from flask import Blueprint, Response, flash, redirect, render_template, request, url_for, current_app
 
+from src.data.loader import load_dataset
+from src.data.preprocessing import preprocess_dataset
+
 from app.services import (
     delete_prediction,
     generate_csv,
@@ -48,10 +51,29 @@ def require_basic_auth(func):
     return wrapper
 
 
+def _get_form_options() -> dict[str, list[str]]:
+    dataset = preprocess_dataset(load_dataset("data/raw/gcp_final_approved_dataset.csv"))
+    return {
+        "service_names": sorted(dataset["Service Name"].dropna().astype(str).str.strip().unique().tolist()),
+        "usage_units": sorted(dataset["Usage Unit"].dropna().astype(str).str.strip().unique().tolist()),
+        "regions": sorted(dataset["Region/Zone"].dropna().astype(str).str.strip().unique().tolist()),
+    }
+
+
 @main_bp.route("/")
 def index():
     history = get_prediction_history(limit=5)
-    return render_template("index.html", history=history, prediction_result=None, values={}, errors=[])
+    options = _get_form_options()
+    return render_template(
+        "index.html",
+        history=history,
+        prediction_result=None,
+        values={},
+        errors=[],
+        service_names=options["service_names"],
+        usage_units=options["usage_units"],
+        regions=options["regions"],
+    )
 
 
 @main_bp.route("/predict", methods=["POST"])
@@ -61,34 +83,46 @@ def predict():
         for error in errors:
             flash(error, "danger")
         history = get_prediction_history(limit=5)
+        options = _get_form_options()
         return render_template(
             "index.html",
             history=history,
             prediction_result=None,
             values=values,
             errors=errors,
+            service_names=options["service_names"],
+            usage_units=options["usage_units"],
+            regions=options["regions"],
         )
 
     try:
         predicted_cost, _ = perform_prediction(values)
         flash("Prediction completed successfully.", "success")
         history = get_prediction_history(limit=5)
+        options = _get_form_options()
         return render_template(
             "index.html",
             history=history,
             prediction_result=predicted_cost,
             values=values,
             errors=[],
+            service_names=options["service_names"],
+            usage_units=options["usage_units"],
+            regions=options["regions"],
         )
     except Exception as exc:
         flash(f"Prediction failed: {exc}", "danger")
         history = get_prediction_history(limit=5)
+        options = _get_form_options()
         return render_template(
             "index.html",
             history=history,
             prediction_result=None,
             values=values,
             errors=[str(exc)],
+            service_names=options["service_names"],
+            usage_units=options["usage_units"],
+            regions=options["regions"],
         )
 
 

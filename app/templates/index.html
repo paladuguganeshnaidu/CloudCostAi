@@ -117,27 +117,30 @@
             <div class="field-grid">
               <label>
                 <span>Service Name</span>
-                <div class="select-shell">
-                  <input type="text" id="service-search" class="search-select" name="service_name_display" value="{{ values.get('service_name','') }}" placeholder="Search service names" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="service-options">
-                  <input type="hidden" name="service_name" value="{{ values.get('service_name','') }}">
-                  <div class="select-dropdown" id="service-options" role="listbox"></div>
-                </div>
+                <select id="service-select" name="service_name" required>
+                  <option value="">Select service</option>
+                  {% for service_name in service_names %}
+                    <option value="{{ service_name }}" {% if values.get('service_name') == service_name %}selected{% endif %}>{{ service_name }}</option>
+                  {% endfor %}
+                </select>
               </label>
               <label>
                 <span>Usage Unit</span>
-                <div class="select-shell">
-                  <input type="text" id="unit-search" class="search-select" name="usage_unit_display" value="{{ values.get('usage_unit','') }}" placeholder="Search unit" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="unit-options">
-                  <input type="hidden" name="usage_unit" value="{{ values.get('usage_unit','') }}">
-                  <div class="select-dropdown" id="unit-options" role="listbox"></div>
-                </div>
+                <select id="unit-select" name="usage_unit" required>
+                  <option value="">Select unit</option>
+                  {% for usage_unit in usage_units %}
+                    <option value="{{ usage_unit }}" {% if values.get('usage_unit') == usage_unit %}selected{% endif %}>{{ usage_unit }}</option>
+                  {% endfor %}
+                </select>
               </label>
               <label>
                 <span>Region / Zone</span>
-                <div class="select-shell">
-                  <input type="text" id="region-search" class="search-select" name="region_display" value="{{ values.get('region','') }}" placeholder="Search regions" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="region-options">
-                  <input type="hidden" name="region" value="{{ values.get('region','') }}">
-                  <div class="select-dropdown" id="region-options" role="listbox"></div>
-                </div>
+                <select id="region-select" name="region" required>
+                  <option value="">Select region</option>
+                  {% for region in regions %}
+                    <option value="{{ region }}" {% if values.get('region') == region %}selected{% endif %}>{{ region }}</option>
+                  {% endfor %}
+                </select>
               </label>
               <label>
                 <span>Usage Quantity</span>
