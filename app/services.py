@@ -12,6 +12,8 @@ from src.data.feature_engineering import create_features
 from src.model.predict import predict_cost
 from app.database import get_db_connection
 
+MAX_DURATION_HOURS = 24 * 365 * 20
+
 
 def sanitize_form_data(form_data: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
     errors: list[str] = []
@@ -51,12 +53,28 @@ def sanitize_form_data(form_data: dict[str, Any]) -> tuple[list[str], dict[str, 
         except (TypeError, ValueError):
             errors.append(f"{label} must be a valid number.")
 
+    if values.get("usage_quantity") is not None and values["usage_quantity"] < 0:
+        errors.append("Usage Quantity must be greater than or equal to 0.")
+    if values.get("cpu") is not None and not 0 <= values["cpu"] <= 100:
+        errors.append("CPU Utilization must be between 0 and 100.")
+    if values.get("memory") is not None and not 0 <= values["memory"] <= 100:
+        errors.append("Memory Utilization must be between 0 and 100.")
+    if values.get("network_in") is not None and values["network_in"] < 0:
+        errors.append("Network Inbound Data must be greater than or equal to 0.")
+    if values.get("network_out") is not None and values["network_out"] < 0:
+        errors.append("Network Outbound Data must be greater than or equal to 0.")
+    if values.get("cost_per_quantity") is not None and values["cost_per_quantity"] < 0:
+        errors.append("Cost per Quantity must be greater than or equal to 0.")
+
     if values.get("usage_start") and values.get("usage_end"):
         try:
             start_date = pd.to_datetime(values["usage_start"])
             end_date = pd.to_datetime(values["usage_end"])
             if start_date > end_date:
                 errors.append("Usage Start Date cannot be later than Usage End Date.")
+            duration_hours = (end_date - start_date).total_seconds() / 3600
+            if duration_hours > MAX_DURATION_HOURS:
+                errors.append("Usage duration is too large. Please choose a shorter range.")
             values["usage_start"] = start_date.strftime("%Y-%m-%d")
             values["usage_end"] = end_date.strftime("%Y-%m-%d")
         except Exception as exc:

@@ -30,6 +30,8 @@ NUMERIC_COLUMNS = [
     "Total Cost (INR)",
 ]
 
+CATEGORICAL_COLUMNS = ["Service Name", "Usage Unit", "Region/Zone"]
+
 
 def preprocess_dataset(df: pd.DataFrame) -> pd.DataFrame:
     """Validate and preprocess the cloud cost dataset."""
@@ -45,11 +47,18 @@ def preprocess_dataset(df: pd.DataFrame) -> pd.DataFrame:
     for column in dataset.select_dtypes(include=["object", "string"]).columns:
         dataset[column] = dataset[column].astype(str).str.strip()
 
+    for column in CATEGORICAL_COLUMNS:
+        if column in dataset.columns:
+            dataset[column] = dataset[column].astype(str).str.strip()
+
     try:
-        dataset["Usage Start Date"] = pd.to_datetime(dataset["Usage Start Date"], format="%d-%m-%Y %H:%M")
-        dataset["Usage End Date"] = pd.to_datetime(dataset["Usage End Date"], format="%d-%m-%Y %H:%M")
+        dataset["Usage Start Date"] = pd.to_datetime(dataset["Usage Start Date"], errors="coerce", format="mixed")
+        dataset["Usage End Date"] = pd.to_datetime(dataset["Usage End Date"], errors="coerce", format="mixed")
     except Exception as exc:
         raise ValueError(f"Invalid date format found in dataset.\n{exc}") from exc
+
+    if dataset[["Usage Start Date", "Usage End Date"]].isna().any().any():
+        raise ValueError("Invalid or missing Usage Start Date / Usage End Date values.")
 
     for column in NUMERIC_COLUMNS:
         dataset[column] = pd.to_numeric(dataset[column], errors="raise")

@@ -1,19 +1,113 @@
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('prediction-form');
+  const cpuSlider = document.querySelector('input[name="cpu"]');
+  const memorySlider = document.querySelector('input[name="memory"]');
+  const cpuValue = document.getElementById('cpu-value');
+  const memoryValue = document.getElementById('memory-value');
+  const categoryData = {
+    service: ['AI Platform','BigQuery','Cloud Armor','Cloud Build','Cloud CDN','Cloud Data Fusion','Cloud Dataproc','Cloud Endpoints','Cloud Functions','Cloud Interconnect','Cloud Load Balancing','Cloud Memorystore','Cloud NAT','Cloud Run','Cloud SQL','Cloud Spanner','Cloud Storage','Cloud VPC','Cloud VPN','Compute Engine','Container Registry','Dataflow','Firestore','Kubernetes Engine','Pub/Sub'],
+    region: ['asia-east1','asia-northeast1','asia-southeast1','australia-southeast1','europe-north1','europe-west1','europe-west3','northamerica-northeast1','southamerica-east1','us-central1','us-east1','us-west1'],
+    unit: ['GB','Hours','Requests']
+  };
   if (form) {
     form.addEventListener('submit', function () {
       const btn = document.getElementById('predict-button');
       if (btn) {
         btn.setAttribute('disabled', 'disabled');
         const spinner = btn.querySelector('.spinner');
+        const thinking = btn.querySelector('.thinking-pill');
+        const label = btn.querySelector('.btn-label');
         if (spinner) spinner.classList.remove('d-none');
+        if (thinking) thinking.classList.remove('d-none');
+        if (label) label.textContent = 'Analyzing';
       }
     });
+  }
+
+  if (cpuSlider && cpuValue) {
+    const syncValue = () => {
+      cpuValue.textContent = `${cpuSlider.value}%`;
+    };
+    syncValue();
+    cpuSlider.addEventListener('input', syncValue);
+  }
+
+  if (memorySlider && memoryValue) {
+    const syncValue = () => {
+      memoryValue.textContent = `${memorySlider.value}%`;
+    };
+    syncValue();
+    memorySlider.addEventListener('input', syncValue);
   }
 
   if (window.lucide) {
     window.lucide.createIcons();
   }
+
+  function initSearchSelect(inputId, hiddenName, optionsId, values) {
+    const input = document.getElementById(inputId);
+    const hidden = document.querySelector(`input[name="${hiddenName}"]`);
+    const dropdown = document.getElementById(optionsId);
+    if (!input || !hidden || !dropdown) return;
+
+    function renderOptions(query = '') {
+      const normalized = query.toLowerCase();
+      const filtered = values.filter((value) => value.toLowerCase().includes(normalized));
+      dropdown.innerHTML = filtered.length ? filtered.map((value) => `<button type="button" class="select-option" data-value="${value}">${value}</button>`).join('') : '<span class="select-empty">No matching option</span>';
+      dropdown.style.display = filtered.length ? 'block' : 'block';
+      input.setAttribute('aria-expanded', 'true');
+      input.setAttribute('aria-activedescendant', filtered[0] ? filtered[0] : '');
+    }
+
+    input.addEventListener('focus', () => renderOptions(input.value));
+    input.addEventListener('input', () => renderOptions(input.value));
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        dropdown.style.display = 'none';
+        input.setAttribute('aria-expanded', 'false');
+        return;
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const firstOption = dropdown.querySelector('.select-option');
+        if (firstOption) {
+          const selectedValue = firstOption.getAttribute('data-value');
+          input.value = selectedValue;
+          hidden.value = selectedValue;
+          dropdown.style.display = 'none';
+          input.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
+
+    dropdown.addEventListener('click', (event) => {
+      const option = event.target.closest('.select-option');
+      if (!option) return;
+      const selectedValue = option.getAttribute('data-value');
+      input.value = selectedValue;
+      hidden.value = selectedValue;
+      dropdown.style.display = 'none';
+      input.setAttribute('aria-expanded', 'false');
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!input.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.style.display = 'none';
+        input.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      setTimeout(() => {
+        dropdown.style.display = 'none';
+        input.setAttribute('aria-expanded', 'false');
+      }, 120);
+    });
+  }
+
+  initSearchSelect('service-search', 'service_name', 'service-options', categoryData.service);
+  initSearchSelect('region-search', 'region', 'region-options', categoryData.region);
+  initSearchSelect('unit-search', 'usage_unit', 'unit-options', categoryData.unit);
 
   const themeToggle = document.getElementById('theme-toggle');
   const savedTheme = localStorage.getItem('cloudcostai-theme');

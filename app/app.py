@@ -4,6 +4,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask
+from whitenoise import WhiteNoise
 
 load_dotenv()
 
@@ -35,6 +36,7 @@ def create_app() -> Flask:
         JSON_SORT_KEYS=False,
     )
     app.register_blueprint(main_bp)
+    app.wsgi_app = WhiteNoise(app.wsgi_app, root=str(PROJECT_ROOT / "app" / "static"), prefix="/static")
     initialize_database()
 
     @app.after_request

@@ -3,9 +3,15 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+from src.data.preprocessing import preprocess_dataset
+
 
 def create_features(df: pd.DataFrame) -> pd.DataFrame:
     dataframe = df.copy()
+
+    if {"Usage Start Date", "Usage End Date"}.issubset(dataframe.columns):
+        dataframe["Usage Start Date"] = pd.to_datetime(dataframe["Usage Start Date"], errors="coerce")
+        dataframe["Usage End Date"] = pd.to_datetime(dataframe["Usage End Date"], errors="coerce")
 
     if "Usage Duration (Hours)" not in dataframe.columns:
         if {"Usage Start Date", "Usage End Date"}.issubset(dataframe.columns):
@@ -62,8 +68,13 @@ def build_preprocessor(X: pd.DataFrame):
     )
 
 
+def prepare_model_frame(df: pd.DataFrame) -> pd.DataFrame:
+    processed = preprocess_dataset(df)
+    return create_features(processed)
+
+
 def engineer_features(df: pd.DataFrame):
-    engineered = create_features(df)
+    engineered = prepare_model_frame(df)
     X = engineered.drop(columns=["Total Cost (INR)"], errors="ignore")
     y = engineered["Total Cost (INR)"]
     preprocessor = build_preprocessor(X)

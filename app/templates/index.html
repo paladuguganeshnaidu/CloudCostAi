@@ -13,7 +13,9 @@
     <div class="page-shell">
       <header class="topbar">
         <a class="brand" href="{{ url_for('main.index') }}">
-          <span class="brand-mark"><i data-lucide="sparkles"></i></span>
+          <span class="brand-mark">
+            <img src="{{ url_for('static', filename='images/cloudcostai-logo.svg') }}" alt="CloudCostAI logo" width="40" height="40">
+          </span>
           <span>
             <strong>CloudCostAI</strong>
             <small>AI Cloud Cost Forecasts</small>
@@ -22,7 +24,7 @@
         <nav class="topnav" aria-label="Primary navigation">
           <a href="{{ url_for('main.index') }}">Predictions</a>
           <a href="{{ url_for('main.admin') }}" {% if not config.SHOW_ADMIN %}hidden{% endif %}>Dashboard</a>
-          <a href="https://github.com/paladuguganeshnaidu/CloudCostAi" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://github.com/paladuguganeshnaidu/CloudCostAI" target="_blank" rel="noreferrer">GitHub</a>
           <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme">
             <i data-lucide="moon"></i>
           </button>
@@ -115,15 +117,27 @@
             <div class="field-grid">
               <label>
                 <span>Service Name</span>
-                <input type="text" name="service_name" value="{{ values.get('service_name','') }}" maxlength="80" required>
+                <div class="select-shell">
+                  <input type="text" id="service-search" class="search-select" name="service_name_display" value="{{ values.get('service_name','') }}" placeholder="Search service names" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="service-options">
+                  <input type="hidden" name="service_name" value="{{ values.get('service_name','') }}">
+                  <div class="select-dropdown" id="service-options" role="listbox"></div>
+                </div>
               </label>
               <label>
                 <span>Usage Unit</span>
-                <input type="text" name="usage_unit" value="{{ values.get('usage_unit','') }}" maxlength="40" required>
+                <div class="select-shell">
+                  <input type="text" id="unit-search" class="search-select" name="usage_unit_display" value="{{ values.get('usage_unit','') }}" placeholder="Search unit" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="unit-options">
+                  <input type="hidden" name="usage_unit" value="{{ values.get('usage_unit','') }}">
+                  <div class="select-dropdown" id="unit-options" role="listbox"></div>
+                </div>
               </label>
               <label>
                 <span>Region / Zone</span>
-                <input type="text" name="region" value="{{ values.get('region','') }}" maxlength="60" required>
+                <div class="select-shell">
+                  <input type="text" id="region-search" class="search-select" name="region_display" value="{{ values.get('region','') }}" placeholder="Search regions" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="region-options">
+                  <input type="hidden" name="region" value="{{ values.get('region','') }}">
+                  <div class="select-dropdown" id="region-options" role="listbox"></div>
+                </div>
               </label>
               <label>
                 <span>Usage Quantity</span>
@@ -137,18 +151,24 @@
             <div class="field-grid">
               <label>
                 <span>CPU Utilization (%)</span>
-                <input type="number" step="0.01" min="0" max="100" name="cpu" value="{{ values.get('cpu','') }}" required>
+                <div class="slider-wrap">
+                  <input type="range" min="0" max="100" step="1" name="cpu" value="{{ values.get('cpu','50') }}" required>
+                  <div class="slider-value" id="cpu-value">{{ values.get('cpu','50') }}%</div>
+                </div>
               </label>
               <label>
                 <span>Memory Utilization (%)</span>
-                <input type="number" step="0.01" min="0" max="100" name="memory" value="{{ values.get('memory','') }}" required>
+                <div class="slider-wrap">
+                  <input type="range" min="0" max="100" step="1" name="memory" value="{{ values.get('memory','50') }}" required>
+                  <div class="slider-value" id="memory-value">{{ values.get('memory','50') }}%</div>
+                </div>
               </label>
               <label>
-                <span>Network Inbound</span>
+                <span>Network Inbound (Bytes)</span>
                 <input type="number" step="0.01" min="0" name="network_in" value="{{ values.get('network_in','') }}" required>
               </label>
               <label>
-                <span>Network Outbound</span>
+                <span>Network Outbound (Bytes)</span>
                 <input type="number" step="0.01" min="0" name="network_out" value="{{ values.get('network_out','') }}" required>
               </label>
             </div>
@@ -181,8 +201,9 @@
           <div class="submit-row">
             <button class="btn btn-primary" type="submit" id="predict-button">
               <i data-lucide="arrow-right"></i>
-              Predict Cost
+              <span class="btn-label">Predict Cost</span>
               <span class="spinner d-none" role="status" aria-hidden="true"></span>
+              <span class="thinking-pill d-none">AI Thinking</span>
             </button>
           </div>
         </form>

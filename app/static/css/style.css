@@ -50,6 +50,16 @@ body::before {
   pointer-events: none;
   background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 25%, transparent 75%, rgba(255,255,255,0.06) 100%);
   opacity: 0.36;
+  animation: drift 20s ease-in-out infinite alternate;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 20% 20%, rgba(217,119,6,0.14), transparent 20%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08), transparent 24%), radial-gradient(circle at 50% 90%, rgba(217,119,6,0.1), transparent 30%);
+  animation: pulseGlow 10s ease-in-out infinite alternate;
 }
 
 .page-shell {
@@ -334,6 +344,58 @@ body[data-theme='dark'] .topbar {
   gap: 14px;
 }
 
+.select-shell {
+  position: relative;
+}
+
+.search-select {
+  position: relative;
+}
+
+.select-dropdown {
+  display: none;
+  position: absolute;
+  z-index: 30;
+  inset-inline: 0;
+  top: calc(100% + 6px);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  max-height: 220px;
+  overflow: auto;
+  padding: 6px;
+}
+
+body[data-theme='dark'] .select-dropdown {
+  background: rgba(43, 43, 39, 0.95);
+}
+
+.select-option {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.select-option:hover {
+  background: var(--card-soft);
+  transform: translateX(2px);
+}
+
+.select-empty {
+  display: block;
+  color: var(--muted);
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
 .field-grid.single { grid-template-columns: 1fr; }
 
 label {
@@ -346,7 +408,7 @@ label {
 
 label span { font-weight: 600; color: var(--text); }
 
-input {
+input, select {
   width: 100%;
   border: 1px solid var(--border);
   background: var(--card);
@@ -354,12 +416,31 @@ input {
   border-radius: 14px;
   padding: 12px 14px;
   outline: none;
-  transition: border-color 220ms ease, box-shadow 220ms ease;
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 180ms ease;
 }
 
-input:focus {
+input[type="range"] {
+  padding: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slider-value {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+input:focus, select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(217,119,6,0.14);
+  transform: translateY(-1px);
 }
 
 .submit-row { justify-content: flex-end; margin-top: 8px; }
@@ -371,6 +452,19 @@ input:focus {
   border: 2px solid rgba(255,255,255,0.4);
   border-top-color: white;
   animation: spin 700ms linear infinite;
+}
+
+.thinking-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.16);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  animation: pulseGlow 1.2s ease-in-out infinite alternate;
 }
 
 .d-none { display: none !important; }

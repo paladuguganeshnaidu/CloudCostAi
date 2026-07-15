@@ -13,7 +13,9 @@
     <div class="page-shell admin-shell">
       <header class="topbar admin-topbar">
         <a class="brand" href="{{ url_for('main.index') }}">
-          <span class="brand-mark"><i data-lucide="sparkles"></i></span>
+          <span class="brand-mark">
+            <img src="{{ url_for('static', filename='images/cloudcostai-logo.svg') }}" alt="CloudCostAI logo" width="40" height="40">
+          </span>
           <span>
             <strong>CloudCostAI</strong>
             <small>Admin Dashboard</small>
