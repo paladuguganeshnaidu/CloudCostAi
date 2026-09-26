@@ -1,145 +1,34 @@
 # CloudCostAI
 
-## Project Description
-
-CloudCostAI is a Flask-based web application for AI-powered cloud cost prediction. The project uses an existing machine learning inference pipeline with a saved model, preprocessor, and feature pipeline in `models/` and serves predictions through a modern Bootstrap dashboard.
+CloudCostAI is a Flask web application for **cloud-cost prediction**. The repository contains a saved machine-learning inference pipeline, a dashboard, prediction history storage and deployment configuration for a Python web service.
 
 ## Features
 
-- Dark glassmorphism UI
-- Cloud cost prediction form
-- Prediction result card
-- SQLite prediction history
-- Admin dashboard with charts
-- Chart.js visualizations for predictions per day, top services, and regions
-- CSV download of history
-- Render-compatible deployment configuration
+- Cloud-cost prediction form.
+- Prediction result view.
+- SQLite prediction history.
+- Admin dashboard.
+- Chart.js visualizations.
+- CSV export of prediction history.
+- Render deployment configuration.
+- Saved model/preprocessor artifacts under `models/`.
 
-## Deployment Files
+## Technology stack
 
-- `render.yaml`
-- `Procfile`
-- `runtime.txt`
-- `requirements.txt`
-- `.gitignore`
-- `README.md`
+- Python
+- Flask 3.0.x
+- pandas
+- NumPy
+- scikit-learn
+- joblib
+- Gunicorn
+- gevent
+- python-dotenv
+- Whitenoise
 
-## Installation
+The exact pinned dependencies are listed in `requirements.txt`.
 
-1. Clone the repository:
-
-```bash
-git clone https://github.com/<your-username>/CloudCostAI.git
-cd CloudCostAI
-```
-
-2. Create a Python virtual environment:
-
-```bash
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-3. Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-## Local Run
-
-1. Start the Flask app locally:
-
-```bash
-python app/app.py
-```
-
-2. Open your browser at:
-
-```text
-http://127.0.0.1:5000
-```
-
-## Render Free Tier Deployment
-
-### Prerequisites
-
-- GitHub account
-- Render account
-- Repository pushed to GitHub
-
-### Render Setup
-
-1. Ensure the repository is pushed to the `main` branch.
-2. On Render, create a new **Web Service**.
-3. Connect your GitHub repository.
-4. Set the branch to `main`.
-
-### Build and Start Commands
-
-- **Build Command:**
-
-```bash
-pip install -r requirements.txt
-```
-
-- **Start Command:**
-
-```bash
-gunicorn "app.app:app" --worker-class gevent --workers 2 --threads 4 --timeout 120
-```
-
-### Runtime
-
-The project uses:
-
-```text
-python-3.13.5
-```
-
-from `runtime.txt`.
-
-### Environment Variables
-
-Render should provide:
-
-- `SECRET_KEY` — set a secure random string
-- `DATABASE_PATH` — optional, default is `cloudcostai.db`
-
-You can create a local `.env` file from `.env.example` for development:
-
-```text
-cp .env.example .env
-# then edit .env and set SECRET_KEY
-```
-
-The app reads environment variables at startup. Do NOT commit a production `SECRET_KEY` to version control.
-
-### Render YAML
-
-The repo includes `render.yaml` with the service configuration for Render Free Tier:
-
-- `type: web`
-- `plan: free`
-- `env: python`
-- `region: oregon`
-- `buildCommand: pip install -r requirements.txt`
-- `startCommand: gunicorn "app.app:app" --worker-class gevent --workers 2 --threads 4 --timeout 120`
-
-## Production Configuration
-
-- App startup is handled in `app/app.py` using:
-
-```python
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-```
-
-- Gunicorn is used for deployment, not `flask run`.
-- The SQLite database is created automatically if missing.
-- The app uses `pathlib.Path` for file resolution.
-
-## Project Structure
+## Repository structure
 
 ```text
 app/
@@ -149,9 +38,7 @@ app/
     admin.html
   static/
     css/
-      style.css
     js/
-      script.js
 models/
   linear_regression.pkl
   preprocessor.pkl
@@ -161,52 +48,138 @@ outputs/
 logs/
 reports/
 src/
-  data/
-  model/
 tests/
 requirements.txt
 render.yaml
 runtime.txt
 Procfile
 README.md
-.gitignore
 ```
 
-## Notes on Render and SQLite
+## Local setup
 
-- Render Free Tier instances can persist app data, but SQLite is not ideal for large-scale production storage.
-- Use SQLite for lightweight history on the free tier.
-- If you need persistence beyond current instance lifetime, migrate to PostgreSQL or MySQL.
+Prerequisite: Python 3.10 or newer.
 
-## Common Deployment Errors
-
-- `ModuleNotFoundError`: ensure the app is started with `gunicorn "app.app:app"`.
-- `ImportError`: ensure `src/` is included in Python path via `app/app.py` and `render.yaml` points to the correct app path.
-- `Database locked`: avoid concurrent writes during heavy load; SQLite is best for light traffic.
-
-## Troubleshooting
-
-- Check Render build logs for dependency installation errors.
-- Confirm `runtime.txt` uses `python-3.13.0`.
-- Verify `Procfile` start command is correct.
-- Use `DATABASE_PATH` environment variable if the default path needs adjustment.
-
-## License
-
-This project is licensed under the MIT License.
-
-## GitHub Readiness
-
-- CI workflow: `.github/workflows/ci.yml` runs tests on push and PRs to `main`.
-- Line endings are normalized with `.gitattributes`.
-- Ensure `SECRET_KEY` is set in your Render or GitHub Actions secrets — do not commit secrets.
-- Use `.env.example` as a template for local development.
-- Before opening a PR, run:
+Create an environment:
 
 ```bash
-python -m pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
+python -m venv .venv
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Start the application:
+
+```bash
+python app/app.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+## Configuration
+
+The application supports environment-based configuration including:
+
+- `SECRET_KEY`
+- `DATABASE_PATH`
+- Flask/Render `PORT`
+
+Create a local `.env` from `.env.example` where appropriate.
+
+Never commit production secrets.
+
+## Render
+
+The repository contains:
+
+- `render.yaml`
+- `Procfile`
+- `runtime.txt`
+
+The documented application entry point is:
+
+```text
+app.app:app
+```
+
+Gunicorn is used for service startup.
+
+Before production deployment, verify the Render Python runtime against the current `runtime.txt` rather than relying on an older README value.
+
+## Data storage
+
+Prediction history currently uses SQLite.
+
+SQLite is suitable for the current lightweight application, but concurrent production workloads and durable managed hosting require a deliberate storage strategy. A managed PostgreSQL/MySQL database is a natural next step for multi-instance or higher-volume deployment.
+
+## Model artifacts
+
+The application expects the saved artifacts under `models/`:
+
+- `linear_regression.pkl`
+- `preprocessor.pkl`
+- `feature_names.pkl`
+
+Do not load untrusted pickle/joblib files in a security-sensitive environment; serialized Python model artifacts can execute code when deserialized.
+
+## Testing
+
+A `tests/` directory is present. Run the available test suite with:
+
+```bash
 python -m pytest -q
 ```
 
-If you want me to also create a LICENSE or GitHub issue/PR templates, say so and I will add them.
+Do not treat the presence of a test directory as proof of a particular coverage percentage or performance level. Record measured results separately when benchmarking.
+
+## Performance
+
+The repository does not provide a verified P95/P99 latency, throughput, concurrency or availability benchmark. Those values should be measured on the target deployment environment before being used in a report or production SLO.
+
+## Security
+
+Current implementation considerations include:
+
+- Keep `SECRET_KEY` outside source control.
+- Validate user inputs before model inference.
+- Avoid exposing raw exception details in production.
+- Restrict admin functionality.
+- Treat model artifacts and prediction history as application data.
+- Move from SQLite to a managed database for multi-instance deployments.
+
+## Limitations
+
+- The project depends on a pre-trained/saved regression pipeline.
+- The README does not claim that the model is universally accurate for every cloud provider or billing schema.
+- Model quality depends on the training data and feature pipeline stored with the project.
+- SQLite limits horizontal scaling and concurrent writes.
+
+## License
+
+This repository contains an MIT License. See [LICENSE](LICENSE).
+
+## Author
+
+Paladugu Ganesh Naidu
+
+Repository: https://github.com/paladuguganeshnaidu/CloudCostAi
